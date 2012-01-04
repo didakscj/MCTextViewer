@@ -5,3 +5,7 @@ bin/
 Bin/
 *.suo
 *.user
+
+
+# ReSharper Files
+_ReSharper.*/
