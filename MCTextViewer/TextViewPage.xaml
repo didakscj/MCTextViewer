@@ -1,0 +1,80 @@
+﻿<phone:PhoneApplicationPage 
+    x:Class="MCTextViewer.TextViewPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:phone="clr-namespace:Microsoft.Phone.Controls;assembly=Microsoft.Phone"
+    xmlns:shell="clr-namespace:Microsoft.Phone.Shell;assembly=Microsoft.Phone"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    FontFamily="{StaticResource PhoneFontFamilyNormal}"
+    FontSize="{StaticResource PhoneFontSizeNormal}"
+    Foreground="{StaticResource PhoneForegroundBrush}"
+    SupportedOrientations="Portrait" Orientation="Portrait"
+    mc:Ignorable="d" shell:SystemTray.IsVisible="True" d:DesignHeight="768" d:DesignWidth="480">
+	<phone:PhoneApplicationPage.Resources>
+		<Storyboard x:Name="menuupani">
+			<DoubleAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.Projection).(PlaneProjection.RotationY)" Storyboard.TargetName="stackPanel1">
+				<EasingDoubleKeyFrame KeyTime="0" Value="90"/>
+				<EasingDoubleKeyFrame KeyTime="0:0:0.5" Value="0"/>
+			</DoubleAnimationUsingKeyFrames>
+		</Storyboard>
+		<Storyboard x:Name="menudownani">
+			<DoubleAnimation Duration="0:0:0.5" To="-90" Storyboard.TargetProperty="(UIElement.Projection).(PlaneProjection.RotationY)" Storyboard.TargetName="stackPanel1" d:IsOptimized="True"/>
+		</Storyboard>
+	</phone:PhoneApplicationPage.Resources>
+
+    <!--LayoutRoot는 모든 페이지 내용이 배치되는 루트 표입니다.-->
+    <Grid x:Name="LayoutRoot" Background="Transparent" Tap="LayoutRoot_Tap" Unloaded="LayoutRoot_Unloaded">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+       
+
+        <!--ContentPanel - 여기에 추가 내용을 배치합니다.-->
+        <Grid x:Name="ContentPanel" Grid.Row="1" Margin="12,0,0,0" Tap="ContentPanel_Tap">
+                <TextBlock TextWrapping="Wrap" FontSize="20" ManipulationDelta="TextBlock_ManipulationDelta" x:Name="textviewblock" TextTrimming="WordEllipsis" VerticalAlignment="Top" ManipulationCompleted="textviewblock_ManipulationCompleted" Tap="textviewblock_Tap" Text=""/>
+                <StackPanel HorizontalAlignment="Left" Margin="0,0,0,0" x:Name="stackPanel1" VerticalAlignment="Top" Visibility="Visible" FlowDirection="RightToLeft">
+                    <StackPanel.Projection>
+                        <PlaneProjection/>
+                    </StackPanel.Projection>
+                    <Grid>
+                    <Rectangle x:Name="rectangle" Stroke="White" Width="460" Opacity="0.9" RenderTransformOrigin="0.5,0.5" Margin="4,6,2,706">
+                    	<Rectangle.Fill>
+                    		<SolidColorBrush Color="{StaticResource PhoneDisabledColor}"/>
+                    	</Rectangle.Fill>
+                        <Rectangle.Projection>
+                            <PlaneProjection />
+                        </Rectangle.Projection>
+                        <Rectangle.RenderTransform>
+                            <CompositeTransform />
+                        </Rectangle.RenderTransform>
+                    </Rectangle>
+                    <TextBlock Name="pageTextblock" Text="0/0" Width="172" Margin="146,6,148,708" TextAlignment="Center" FontSize="26" />
+                    <Slider Height="620" HorizontalAlignment="Right" Margin="0,48,390,0" Name="pageslider" VerticalAlignment="Top" Width="70" FlowDirection="LeftToRight" Orientation="Vertical" ValueChanged="pageslider_ValueChanged" Opacity="0.5">
+                    	<Slider.Projection>
+                    		<PlaneProjection RotationX="180"/>
+                    	</Slider.Projection>
+                    </Slider>
+                    <Button Content="Close" Height="74" HorizontalAlignment="Left" Margin="5,673,0,0" Name="btnclosetext" VerticalAlignment="Top" Width="460" Opacity="0.7" Click="btnclosetext_Click" Foreground="White" Background="#66FFFFFF"></Button>
+                </Grid>
+                </StackPanel>
+            
+        </Grid>
+        
+    </Grid>
+    
+    <!--ApplicationBar 사용법을 보여 주는 샘플 코드-->
+    <!--<phone:PhoneApplicationPage.ApplicationBar>
+        <shell:ApplicationBar IsVisible="True" IsMenuEnabled="True">
+            <shell:ApplicationBarIconButton IconUri="/Images/appbar_button1.png" Text="단추 1"/>
+            <shell:ApplicationBarIconButton IconUri="/Images/appbar_button2.png" Text="단추 2"/>
+            <shell:ApplicationBar.MenuItems>
+                <shell:ApplicationBarMenuItem Text="메뉴 항목 1"/>
+                <shell:ApplicationBarMenuItem Text="메뉴 항목 2"/>
+            </shell:ApplicationBar.MenuItems>
+        </shell:ApplicationBar>
+    </phone:PhoneApplicationPage.ApplicationBar>-->
+
+</phone:PhoneApplicationPage>
