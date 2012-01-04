@@ -645,8 +645,12 @@ namespace MCTextViewer
                 }
                 else
                 {
-                    StreamWriter sw = new StreamWriter(new IsolatedStorageFileStream("DownloadFiles\\" + filename, FileMode.Create, file));
-                    sw.Write(EUCKR_Unicode_Library.EUCKR_Unicode_Converter.GetUnicodeString(contents));
+                    String convertstring = EUCKR_Unicode_Library.EUCKR_Unicode_Converter.GetUnicodeString(contents);
+                    byte[] unicodecontents = System.Text.Encoding.UTF8.GetBytes(convertstring);
+                    using (IsolatedStorageFileStream stream = new IsolatedStorageFileStream("DownloadFiles\\" + filename, FileMode.Create, file))
+                    {
+                        stream.Write(unicodecontents, 0, unicodecontents.Length);
+                    }
                 }
 
                 int index = getItemIndexFromName(filename);
