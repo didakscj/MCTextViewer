@@ -1,0 +1,7 @@
+
+# Visual Studio Output Files
+obj/
+bin/
+Bin/
+*.suo
+*.user
