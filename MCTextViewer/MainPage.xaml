@@ -78,7 +78,7 @@
             <!--Panorama 항목 1-->
             <controls:PanoramaItem Header="Text Library">
                 <!--텍스트 줄 바꿈이 있는 이중선 목록-->
-                <ListBox Margin="0,0,-12,0" Name="lb_library" ItemTemplate="{StaticResource DataTemplate}" MouseLeftButtonUp="lb_library_MouseLeftButtonUp" />
+                <ListBox Margin="0,0,-12,70" Name="lb_library" ItemTemplate="{StaticResource DataTemplate}" MouseLeftButtonUp="lb_library_MouseLeftButtonUp" />
             </controls:PanoramaItem>
 
             <!--Panorama 항목 2-->
