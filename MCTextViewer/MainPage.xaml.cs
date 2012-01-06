@@ -131,12 +131,13 @@ namespace MCTextViewer
             dropboxloadingPanel.Children.Add(dropboxLoadingBar);
             dropboxloadingPanel.Visibility = Visibility.Collapsed;
 
+
+
             //다운로드 데이타 리스트 선 색
             downloadingTitle.Visibility = Visibility.Collapsed;  
             lb_daownloaddata.ItemsSource = Downlists;
             lb_daownloaddata.BorderBrush = (Brush)Application.Current.Resources["PhoneForegroundBrush"];
             lb_daownloaddata.Visibility = Visibility.Collapsed;
-
             // 다운로드 로딩 프로그래스바
             downloadLoadingBar = new ProgressBar();
             downloadLoadingBar.Foreground = (Brush)Application.Current.Resources["PhoneAccentBrush"];
@@ -300,7 +301,7 @@ namespace MCTextViewer
             {
                 //드롭박스 접속용 초기화
                 DropboxConnected = true;
-                App._client = new DropNetClient("meqy9y4nicqmr3k", "8g6858obthlzghw");
+                App._client = new DropNetClient(DROPBOXAPPKEY, DROPBOXSCRETKEY);
                 // Async
                 App._client.GetTokenAsync((userToken) =>
                 {
@@ -475,8 +476,8 @@ namespace MCTextViewer
         private void SelectedFileDownload(DropBoxDataList selectedBoxItem)
         {
             DropBoxFileDownload dropdownload = new DropBoxFileDownload();
-            String requesturl = dropdownload.getfiledownloadrequest(selectedBoxItem.Path, "meqy9y4nicqmr3k",
-                                        "8g6858obthlzghw", DropboxUserToken, DropboxScretToken);
+            String requesturl = dropdownload.getfiledownloadrequest(selectedBoxItem.Path, DROPBOXAPPKEY,
+                                        DROPBOXSCRETKEY, DropboxUserToken, DropboxScretToken);
             
             //MessageBox.Show(requesturl);
             //다운로드 리스트에 추가
@@ -513,7 +514,7 @@ namespace MCTextViewer
 
             //파일 다운로드용 드롭박스 클라이언트 
             //드롭박스 접속용 초기화
-            //DropNetClient _downclient = new DropNetClient("meqy9y4nicqmr3k", "8g6858obthlzghw");
+            //DropNetClient _downclient = new DropNetClient(DROPBOXAPPKEY, DROPBOXSCRETKEY);
             //_downclient.UserLogin = new UserLogin { Token = DropboxUserToken, Secret = DropboxScretToken };
             
            
