@@ -64,6 +64,15 @@
                 <ProgressBar Height="13" HorizontalAlignment="Left"  VerticalAlignment="Center" Width="143" Value="{Binding Progressbarval}" />
             </StackPanel>
         </DataTemplate>
+
+        <!-- Panorama Items Header -->
+        <DataTemplate x:Key="DropBoxItemHeader">
+            <Grid>
+                <ContentPresenter>
+                    <TextBlock Text="{Binding}" FontSize="49" />
+                </ContentPresenter>
+            </Grid>
+        </DataTemplate>
     </phone:PhoneApplicationPage.Resources>
     
     <!--LayoutRoot는 모든 페이지 내용이 배치되는 루트 표입니다.-->
@@ -82,7 +91,7 @@
             </controls:PanoramaItem>
 
             <!--Panorama 항목 2-->
-            <controls:PanoramaItem Header="Text Download">
+            <controls:PanoramaItem Header="DropBox Download" HeaderTemplate="{StaticResource DropBoxItemHeader}">
                 <!--텍스트 줄 바꿈이 있는 이중선 목록-->
                 <Grid>
                     <phone:WebBrowser Height="492" HorizontalAlignment="Left" Margin="0,0,0,0" Name="loginBrowser" VerticalAlignment="Top" Width="418" IsScriptEnabled="True" />
