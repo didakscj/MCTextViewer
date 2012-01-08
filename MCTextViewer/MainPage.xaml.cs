@@ -203,8 +203,7 @@ namespace MCTextViewer
         /// <summary>
         /// 선택된 PanoramaItem 페이지를 활성화 한다.
         /// </summary>
-        /// <param name="e"> 선택된 PanoramaItem </param>
-        private void ActivateSelectedPanoramaItem(SelectionChangedEventArgs e)
+        private void ActivateSelectedPanoramaItem()
         {
             PanoramaItem panoItem = panoramaMain.SelectedItem as PanoramaItem;
             if (panoItem == null)
@@ -253,7 +252,7 @@ namespace MCTextViewer
         /// <param name="e"> SelecionChanged 이벤트 정보 </param>
         private void Panorama_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            ActivateSelectedPanoramaItem(e);
+            ActivateSelectedPanoramaItem();
         }
 
         void seledtedViewButton_Click(object sender, EventArgs e)
