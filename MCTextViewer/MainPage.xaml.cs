@@ -197,6 +197,46 @@ namespace MCTextViewer
             }
         }
 
+
+        #region Private Instance Method
+
+        /// <summary>
+        /// 선택된 PanoramaItem 페이지를 활성화 한다.
+        /// </summary>
+        /// <param name="e"> 선택된 PanoramaItem </param>
+        private void ActivateSelectedPanoramaItem(SelectionChangedEventArgs e)
+        {
+            PanoramaItem panoItem = panoramaMain.SelectedItem as PanoramaItem;
+            if (panoItem == null)
+                return;
+
+            string panoItemTag = panoItem.Tag.ToString();
+            if (string.IsNullOrWhiteSpace(panoItemTag))
+                return;
+
+            switch (panoItemTag)
+            {
+                case "panoItemTextLibrary":
+                    ApplicationBar.Mode = ApplicationBarMode.Default;
+                    //ApplicationBarMenuItem menuitem = new ApplicationBarMenuItem("menu|");
+                    //ApplicationBar.Buttons.Add(seledtedDeleteButton);
+                    ApplicationBar.IsVisible = true;
+                    ApplicationBar.Mode = ApplicationBarMode.Minimized;
+                    ReadFileList();
+                    break;
+
+                case "panoItemDropBoxDownload":
+                    ApplicationBar.IsVisible = false;
+                    if (!DropboxConnected)
+                        DropboxConnect();
+
+                    break;
+            }
+        }
+
+        #endregion Private Instance Method
+
+
         private void lb_library_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
             //LibraryDataList libSelectedItem = (LibraryDataList)lb_library.SelectedItem;
@@ -206,30 +246,14 @@ namespace MCTextViewer
 
         }
 
+        /// <summary>
+        /// 선택된 PanoramaItem 변경 시
+        /// </summary>
+        /// <param name="sender"> Panorama Control </param>
+        /// <param name="e"> SelecionChanged 이벤트 정보 </param>
         private void Panorama_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            PanoramaItem item = (PanoramaItem)e.AddedItems[0];
-           
-            switch (item.Header.ToString())
-            {
-                case "Text Library" :
-                    ApplicationBar.Mode = ApplicationBarMode.Default;
-                    //ApplicationBarMenuItem menuitem = new ApplicationBarMenuItem("menu|");
-
-                    //ApplicationBar.Buttons.Add(seledtedDeleteButton);
-                    
-                    ApplicationBar.IsVisible = true;
-                    ApplicationBar.Mode = ApplicationBarMode.Minimized;
-                    ReadFileList();
-                    break;
-                case "Text Download":
-                    ApplicationBar.IsVisible = false;
-                    if (!DropboxConnected)
-                    {
-                        DropboxConnect();
-                    }
-                    break;
-            }
+            ActivateSelectedPanoramaItem(e);
         }
 
         void seledtedViewButton_Click(object sender, EventArgs e)

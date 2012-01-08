@@ -79,19 +79,22 @@
     <Grid x:Name="LayoutRoot" Background="Transparent">
  
         <!--Panorama 컨트롤-->
-        <controls:Panorama Title="MCText Viewer" SelectionChanged="Panorama_SelectionChanged">
+        <controls:Panorama Name="panoramaMain" Title="MCText Viewer" SelectionChanged="Panorama_SelectionChanged">
             <controls:Panorama.Background>
                 <ImageBrush ImageSource="PanoramaBackground.png"/>
             </controls:Panorama.Background>
  
             <!--Panorama 항목 1-->
-            <controls:PanoramaItem Header="Text Library">
+            <controls:PanoramaItem Header="Text Library" 
+                                   Tag="panoItemTextLibrary">
                 <!--텍스트 줄 바꿈이 있는 이중선 목록-->
                 <ListBox Margin="0,0,-12,70" Name="lb_library" ItemTemplate="{StaticResource DataTemplate}" MouseLeftButtonUp="lb_library_MouseLeftButtonUp" />
             </controls:PanoramaItem>
 
             <!--Panorama 항목 2-->
-            <controls:PanoramaItem Header="DropBox Download" HeaderTemplate="{StaticResource DropBoxItemHeader}">
+            <controls:PanoramaItem Header="DropBox Download" 
+                                   HeaderTemplate="{StaticResource DropBoxItemHeader}"
+                                   Tag="panoItemDropBoxDownload">
                 <!--텍스트 줄 바꿈이 있는 이중선 목록-->
                 <Grid>
                     <phone:WebBrowser Height="492" HorizontalAlignment="Left" Margin="0,0,0,0" Name="loginBrowser" VerticalAlignment="Top" Width="418" IsScriptEnabled="True" />
