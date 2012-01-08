@@ -94,10 +94,10 @@ namespace MCTextViewer
             }
 
             
-            makepage2();
+            makepage();
             
         }
-        public void makepage2()
+        public void makepage()
         {
 
             var bw = new BackgroundWorker();
@@ -255,177 +255,177 @@ namespace MCTextViewer
             sw.Close();
         }
 
-        public void makepage()
-        {
-            Dispatcher.BeginInvoke(() =>
-            {
+        //public void makepage()
+        //{
+        //    Dispatcher.BeginInvoke(() =>
+        //    {
                 
-                //textviewblock.FontSize = 20;
-                string line;
-                string lineString = "";
-                int linecnt = 0;
-                string[] lines = Regex.Split(totalString, "\r\n");
+        //        //textviewblock.FontSize = 20;
+        //        string line;
+        //        string lineString = "";
+        //        int linecnt = 0;
+        //        string[] lines = Regex.Split(totalString, "\r\n");
 
-                for(int i = 0; i<lines.Length; i++)
-                {
-                    int charcnt = 0;
-                    line = lines[i];
-                    //int insertindex = 0;
-                    //int linebyte = Encoding.UTF8.GetByteCount(line);
+        //        for(int i = 0; i<lines.Length; i++)
+        //        {
+        //            int charcnt = 0;
+        //            line = lines[i];
+        //            //int insertindex = 0;
+        //            //int linebyte = Encoding.UTF8.GetByteCount(line);
 
-                    //if (linebyte > line.Length)
-                    //{
-                    //    //유니코드 문자열
-                    //    //insertindex = (44 + (4 * (20 - (int)textviewblock.FontSize)))/2;
-                    //    insertindex = 22;
-                    //}
-                    //else
-                    //{
-                    //    insertindex = 44;
-                    //}
-                    //for (int cnt = 1; insertindex*cnt <= line.Length; cnt ++)
-                    //{
-                    //    line = line.Insert(insertindex*cnt, "\n");
-                    //}
+        //            //if (linebyte > line.Length)
+        //            //{
+        //            //    //유니코드 문자열
+        //            //    //insertindex = (44 + (4 * (20 - (int)textviewblock.FontSize)))/2;
+        //            //    insertindex = 22;
+        //            //}
+        //            //else
+        //            //{
+        //            //    insertindex = 44;
+        //            //}
+        //            //for (int cnt = 1; insertindex*cnt <= line.Length; cnt ++)
+        //            //{
+        //            //    line = line.Insert(insertindex*cnt, "\n");
+        //            //}
                     
 
-                    for (int j = 0; j < line.Length; j++)
-                    {
+        //            for (int j = 0; j < line.Length; j++)
+        //            {
 
-                        int bytecnt = Encoding.UTF8.GetByteCount(line[j].ToString());
-                        if (bytecnt == 3)
-                        {
-                            //한글인경우 2글자로 취급
-                            charcnt += 2;
-                        }
-                        else
-                        {
-                            charcnt++;
-                        }
+        //                int bytecnt = Encoding.UTF8.GetByteCount(line[j].ToString());
+        //                if (bytecnt == 3)
+        //                {
+        //                    //한글인경우 2글자로 취급
+        //                    charcnt += 2;
+        //                }
+        //                else
+        //                {
+        //                    charcnt++;
+        //                }
 
-                        if ((charcnt / (44 + (4 * (20 - (int)textviewblock.FontSize))) > 0))
-                        {
-                            line = line.Insert(j + 1, "\r\n");
-                            charcnt = 0;
-                            j++;
-                        }
-                    }
+        //                if ((charcnt / (44 + (4 * (20 - (int)textviewblock.FontSize))) > 0))
+        //                {
+        //                    line = line.Insert(j + 1, "\r\n");
+        //                    charcnt = 0;
+        //                    j++;
+        //                }
+        //            }
 
-                    string[] tmplines = Regex.Split(line, "\r\n");
-                    //linecnt += tmplines.Length;
-                    for (int k = 0; k < tmplines.Length; k++)
-                    {
-                        lineString += tmplines[k] + "\r\n";
-                        //if (k == tmplines.Length - 1 && tmplines.Length > 1)
-                        //{
-                        //    //
-                        //}
-                        //else
-                        //{
-                        //    lineString += "\n";
-                        //}
+        //            string[] tmplines = Regex.Split(line, "\r\n");
+        //            //linecnt += tmplines.Length;
+        //            for (int k = 0; k < tmplines.Length; k++)
+        //            {
+        //                lineString += tmplines[k] + "\r\n";
+        //                //if (k == tmplines.Length - 1 && tmplines.Length > 1)
+        //                //{
+        //                //    //
+        //                //}
+        //                //else
+        //                //{
+        //                //    lineString += "\n";
+        //                //}
 
-                        linecnt++;
-                        if (linecnt >= (28 + (2 * (20 - (int)textviewblock.FontSize))))
-                        {
-                            pages.Add(lineString);
-                            linecnt = 0;
-                            lineString = "";
-                        }
-                    }
+        //                linecnt++;
+        //                if (linecnt >= (28 + (2 * (20 - (int)textviewblock.FontSize))))
+        //                {
+        //                    pages.Add(lineString);
+        //                    linecnt = 0;
+        //                    lineString = "";
+        //                }
+        //            }
 
-                    if (linecnt >= (28 + (2 * (20 - (int)textviewblock.FontSize))))
-                    {
-                        pages.Add(lineString);
-                        linecnt = 0;
-                        lineString = "";
-                    }
+        //            if (linecnt >= (28 + (2 * (20 - (int)textviewblock.FontSize))))
+        //            {
+        //                pages.Add(lineString);
+        //                linecnt = 0;
+        //                lineString = "";
+        //            }
 
-                }
-                pages.Add(lineString);
-
-
-
-                //int readsr = 0;
-
-                //string totalString = sr.ReadToEnd();
-
-
-                ////totalString = totalString.Replace("\n", "");
-                ////totalString = totalString.Replace("  \r\n", "\r\n");
-                ////totalString = totalString.Replace("\r\n", "");
-                ////totalString = totalString.Replace("\r\n\r\n", "\r\n");
-                //while (totalString.Contains("  \r\n"))
-                //{
-                //    totalString = totalString.Replace("  \r\n", "\r\n");
-                //}
-                //while (totalString.Contains(" \r\n"))
-                //{
-                //    totalString = totalString.Replace(" \r\n", "\r\n");
-                //}
-                //while (totalString.Contains("\r\n\r\n"))
-                //{
-                //    totalString = totalString.Replace("\r\n\r\n", "\r\n");
-                //}
+        //        }
+        //        pages.Add(lineString);
 
 
 
-                //int stringIndex = 0;
+        //        //int readsr = 0;
 
-                //while (true)
-                //{
-                //    char[] data = new char[400];
-
-                //    try
-                //    {
-                //        totalString.CopyTo(stringIndex, data, 0, data.Length);
+        //        //string totalString = sr.ReadToEnd();
 
 
-                //        pages.Add(new String(data));
-                //        stringIndex += 400;
-                //        if (stringIndex > totalString.Length)
-                //        {
-                //            break;
-                //        }
-                //    }
-                //    catch (ArgumentOutOfRangeException)
-                //    {
-                //        totalString.CopyTo(stringIndex, data, 0, totalString.Length - stringIndex);
-                //        pages.Add(new String(data));
-                //        break;
-                //    }
+        //        ////totalString = totalString.Replace("\n", "");
+        //        ////totalString = totalString.Replace("  \r\n", "\r\n");
+        //        ////totalString = totalString.Replace("\r\n", "");
+        //        ////totalString = totalString.Replace("\r\n\r\n", "\r\n");
+        //        //while (totalString.Contains("  \r\n"))
+        //        //{
+        //        //    totalString = totalString.Replace("  \r\n", "\r\n");
+        //        //}
+        //        //while (totalString.Contains(" \r\n"))
+        //        //{
+        //        //    totalString = totalString.Replace(" \r\n", "\r\n");
+        //        //}
+        //        //while (totalString.Contains("\r\n\r\n"))
+        //        //{
+        //        //    totalString = totalString.Replace("\r\n\r\n", "\r\n");
+        //        //}
 
-                //}
 
 
-                /////////////////
-                //do
-                //{
+        //        //int stringIndex = 0;
 
-                //    readsr = sr.ReadBlock(data, 0, data.Length);
-                //    pages.Add(new String(data));
+        //        //while (true)
+        //        //{
+        //        //    char[] data = new char[400];
 
-                //}
-                //while (readsr > 0);
-                ////sr.ReadBlock(data, textindex, 450);
+        //        //    try
+        //        //    {
+        //        //        totalString.CopyTo(stringIndex, data, 0, data.Length);
 
-                ////페이지수가 결정됐으니까 슬라이더에 설정해놓음
-                //pageslider.Maximum = pages.Count;
-                //pageslider.Minimum = 1;
 
-                ////textLoadingbar.IsIndeterminate = false;
-                ////textLoadingPanel.Visibility = Visibility.Collapsed;
+        //        //        pages.Add(new String(data));
+        //        //        stringIndex += 400;
+        //        //        if (stringIndex > totalString.Length)
+        //        //        {
+        //        //            break;
+        //        //        }
+        //        //    }
+        //        //    catch (ArgumentOutOfRangeException)
+        //        //    {
+        //        //        totalString.CopyTo(stringIndex, data, 0, totalString.Length - stringIndex);
+        //        //        pages.Add(new String(data));
+        //        //        break;
+        //        //    }
 
-                //stackPanel1.Visibility = Visibility.Visible;
+        //        //}
 
-                ////마지막에 봤던 페이지 있나
-                //readsetting();
 
-                //readText();
+        //        /////////////////
+        //        //do
+        //        //{
+
+        //        //    readsr = sr.ReadBlock(data, 0, data.Length);
+        //        //    pages.Add(new String(data));
+
+        //        //}
+        //        //while (readsr > 0);
+        //        ////sr.ReadBlock(data, textindex, 450);
+
+        //        ////페이지수가 결정됐으니까 슬라이더에 설정해놓음
+        //        //pageslider.Maximum = pages.Count;
+        //        //pageslider.Minimum = 1;
+
+        //        ////textLoadingbar.IsIndeterminate = false;
+        //        ////textLoadingPanel.Visibility = Visibility.Collapsed;
+
+        //        //stackPanel1.Visibility = Visibility.Visible;
+
+        //        ////마지막에 봤던 페이지 있나
+        //        //readsetting();
+
+        //        //readText();
      
                
-            });
-        }
+        //    });
+        //}
 
         //public static byte[] StringToAscii(string s)
         //{
