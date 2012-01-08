@@ -275,6 +275,7 @@ namespace MCTextViewer
                 {
                     //셋팅 지우기
                     IsolatedStorageSettings.ApplicationSettings[libSelectedItem.Name] = null;
+                    IsolatedStorageSettings.ApplicationSettings[libSelectedItem.Name + "readcount"] = null;
                 }
                 catch (KeyNotFoundException)
                 {
@@ -301,7 +302,7 @@ namespace MCTextViewer
             {
                 //드롭박스 접속용 초기화
                 DropboxConnected = true;
-                App._client = new DropNetClient(DROPBOXAPPKEY, DROPBOXSCRETKEY);
+                App._client = new DropNetClient("meqy9y4nicqmr3k", "8g6858obthlzghw");
                 // Async
                 App._client.GetTokenAsync((userToken) =>
                 {
@@ -476,8 +477,8 @@ namespace MCTextViewer
         private void SelectedFileDownload(DropBoxDataList selectedBoxItem)
         {
             DropBoxFileDownload dropdownload = new DropBoxFileDownload();
-            String requesturl = dropdownload.getfiledownloadrequest(selectedBoxItem.Path, DROPBOXAPPKEY,
-                                        DROPBOXSCRETKEY, DropboxUserToken, DropboxScretToken);
+            String requesturl = dropdownload.getfiledownloadrequest(selectedBoxItem.Path, "meqy9y4nicqmr3k",
+                                        "8g6858obthlzghw", DropboxUserToken, DropboxScretToken);
             
             //MessageBox.Show(requesturl);
             //다운로드 리스트에 추가
@@ -514,7 +515,7 @@ namespace MCTextViewer
 
             //파일 다운로드용 드롭박스 클라이언트 
             //드롭박스 접속용 초기화
-            //DropNetClient _downclient = new DropNetClient(DROPBOXAPPKEY, DROPBOXSCRETKEY);
+            //DropNetClient _downclient = new DropNetClient("meqy9y4nicqmr3k", "8g6858obthlzghw");
             //_downclient.UserLogin = new UserLogin { Token = DropboxUserToken, Secret = DropboxScretToken };
             
            
@@ -662,6 +663,17 @@ namespace MCTextViewer
                         downloadLoadingBar.IsIndeterminate = false;
                         downloadLoadingPanel.Visibility = Visibility.Collapsed;
                     }
+                }
+
+                try
+                {
+                    //셋팅 지우기
+                    IsolatedStorageSettings.ApplicationSettings[filename] = null;
+                    IsolatedStorageSettings.ApplicationSettings[filename + "readcount"] = null;
+                }
+                catch (KeyNotFoundException)
+                {
+                    //없으면 말고
                 }
             }
             catch (Exception)

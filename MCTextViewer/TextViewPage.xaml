@@ -34,16 +34,13 @@
 
         <!--ContentPanel - 여기에 추가 내용을 배치합니다.-->
         <Grid x:Name="ContentPanel" Grid.Row="1" Margin="12,0,0,0" Tap="ContentPanel_Tap">
-                <TextBlock TextWrapping="Wrap" FontSize="20" ManipulationDelta="TextBlock_ManipulationDelta" x:Name="textviewblock" TextTrimming="WordEllipsis" VerticalAlignment="Top" ManipulationCompleted="textviewblock_ManipulationCompleted" Tap="textviewblock_Tap" Text=""/>
+                <TextBlock TextWrapping="NoWrap" FontSize="20" ManipulationDelta="TextBlock_ManipulationDelta" x:Name="textviewblock" TextTrimming="None" VerticalAlignment="Top" ManipulationCompleted="textviewblock_ManipulationCompleted" Tap="textviewblock_Tap" Text=""/>
                 <StackPanel HorizontalAlignment="Left" Margin="0,0,0,0" x:Name="stackPanel1" VerticalAlignment="Top" Visibility="Visible" FlowDirection="RightToLeft">
                     <StackPanel.Projection>
                         <PlaneProjection/>
                     </StackPanel.Projection>
                     <Grid>
-                    <Rectangle x:Name="rectangle" Stroke="White" Width="460" Opacity="0.9" RenderTransformOrigin="0.5,0.5" Margin="4,6,2,706">
-                    	<Rectangle.Fill>
-                    		<SolidColorBrush Color="{StaticResource PhoneDisabledColor}"/>
-                    	</Rectangle.Fill>
+                    <Rectangle x:Name="rectangle" Stroke="White" Width="460" Opacity="1" RenderTransformOrigin="0.5,0.5" Margin="4,6,2,706" Fill="#B0000000">
                         <Rectangle.Projection>
                             <PlaneProjection />
                         </Rectangle.Projection>
@@ -57,10 +54,14 @@
                     		<PlaneProjection RotationX="180"/>
                     	</Slider.Projection>
                     </Slider>
-                    <Button Content="Close" Height="74" HorizontalAlignment="Left" Margin="5,673,0,0" Name="btnclosetext" VerticalAlignment="Top" Width="460" Opacity="0.7" Click="btnclosetext_Click" Foreground="White" Background="#66FFFFFF"></Button>
+                    <Button Content="Close" Height="74" HorizontalAlignment="Left" Margin="5,673,0,0" Name="btnclosetext" VerticalAlignment="Top" Width="460" Opacity="1" Click="btnclosetext_Click" Foreground="White" Background="#B1000000"></Button>
+                    
                 </Grid>
                 </StackPanel>
-            
+                <StackPanel Height="88" HorizontalAlignment="Left" Margin="86,331,0,0" Name="textLoadingPanel" VerticalAlignment="Top" Width="280" Visibility="Visible">
+                    <TextBlock Height="37" Name="textLoadingMessage" Text="Loading.." Width="237" FlowDirection="LeftToRight" TextAlignment="Center" />
+                    <ProgressBar Height="27" Name="textLoadingbar" Width="246" Foreground="{StaticResource PhoneAccentBrush}" Background="{x:Null}" />
+                </StackPanel>
         </Grid>
         
     </Grid>
