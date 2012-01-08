@@ -197,6 +197,45 @@ namespace MCTextViewer
             }
         }
 
+
+        #region Private Instance Method
+
+        /// <summary>
+        /// 선택된 PanoramaItem 페이지를 활성화 한다.
+        /// </summary>
+        private void ActivateSelectedPanoramaItem()
+        {
+            PanoramaItem panoItem = panoramaMain.SelectedItem as PanoramaItem;
+            if (panoItem == null)
+                return;
+
+            string panoItemTag = panoItem.Tag.ToString();
+            if (string.IsNullOrWhiteSpace(panoItemTag))
+                return;
+
+            switch (panoItemTag)
+            {
+                case "panoItemTextLibrary":
+                    ApplicationBar.Mode = ApplicationBarMode.Default;
+                    //ApplicationBarMenuItem menuitem = new ApplicationBarMenuItem("menu|");
+                    //ApplicationBar.Buttons.Add(seledtedDeleteButton);
+                    ApplicationBar.IsVisible = true;
+                    ApplicationBar.Mode = ApplicationBarMode.Minimized;
+                    ReadFileList();
+                    break;
+
+                case "panoItemDropBoxDownload":
+                    ApplicationBar.IsVisible = false;
+                    if (!DropboxConnected)
+                        DropboxConnect();
+
+                    break;
+            }
+        }
+
+        #endregion Private Instance Method
+
+
         private void lb_library_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
             //LibraryDataList libSelectedItem = (LibraryDataList)lb_library.SelectedItem;
@@ -206,30 +245,14 @@ namespace MCTextViewer
 
         }
 
+        /// <summary>
+        /// 선택된 PanoramaItem 변경 시
+        /// </summary>
+        /// <param name="sender"> Panorama Control </param>
+        /// <param name="e"> SelecionChanged 이벤트 정보 </param>
         private void Panorama_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            PanoramaItem item = (PanoramaItem)e.AddedItems[0];
-           
-            switch (item.Header.ToString())
-            {
-                case "Text Library" :
-                    ApplicationBar.Mode = ApplicationBarMode.Default;
-                    //ApplicationBarMenuItem menuitem = new ApplicationBarMenuItem("menu|");
-
-                    //ApplicationBar.Buttons.Add(seledtedDeleteButton);
-                    
-                    ApplicationBar.IsVisible = true;
-                    ApplicationBar.Mode = ApplicationBarMode.Minimized;
-                    ReadFileList();
-                    break;
-                case "Text Download":
-                    ApplicationBar.IsVisible = false;
-                    if (!DropboxConnected)
-                    {
-                        DropboxConnect();
-                    }
-                    break;
-            }
+            ActivateSelectedPanoramaItem();
         }
 
         void seledtedViewButton_Click(object sender, EventArgs e)
@@ -302,7 +325,9 @@ namespace MCTextViewer
             {
                 //드롭박스 접속용 초기화
                 DropboxConnected = true;
+
                 App._client = new DropNetClient("meqy9y4nicqmr3k", "8g6858obthlzghw");
+
                 // Async
                 App._client.GetTokenAsync((userToken) =>
                 {
@@ -477,8 +502,10 @@ namespace MCTextViewer
         private void SelectedFileDownload(DropBoxDataList selectedBoxItem)
         {
             DropBoxFileDownload dropdownload = new DropBoxFileDownload();
+
             String requesturl = dropdownload.getfiledownloadrequest(selectedBoxItem.Path, "meqy9y4nicqmr3k",
                                         "8g6858obthlzghw", DropboxUserToken, DropboxScretToken);
+
             
             //MessageBox.Show(requesturl);
             //다운로드 리스트에 추가
@@ -515,7 +542,9 @@ namespace MCTextViewer
 
             //파일 다운로드용 드롭박스 클라이언트 
             //드롭박스 접속용 초기화
+
             //DropNetClient _downclient = new DropNetClient("meqy9y4nicqmr3k", "8g6858obthlzghw");
+
             //_downclient.UserLogin = new UserLogin { Token = DropboxUserToken, Secret = DropboxScretToken };
             
            

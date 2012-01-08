@@ -64,25 +64,38 @@
                 <ProgressBar Height="13" HorizontalAlignment="Left"  VerticalAlignment="Center" Width="143" Value="{Binding Progressbarval}" />
             </StackPanel>
         </DataTemplate>
+
+        <!-- Panorama Items Header -->
+        <DataTemplate x:Key="DropBoxItemHeader">
+            <Grid>
+                <ContentPresenter>
+                    <TextBlock Text="{Binding}" FontSize="62" />
+                </ContentPresenter>
+            </Grid>
+        </DataTemplate>
     </phone:PhoneApplicationPage.Resources>
     
     <!--LayoutRoot는 모든 페이지 내용이 배치되는 루트 표입니다.-->
     <Grid x:Name="LayoutRoot" Background="Transparent">
  
         <!--Panorama 컨트롤-->
-        <controls:Panorama Title="MCText Viewer" SelectionChanged="Panorama_SelectionChanged">
+        <controls:Panorama Name="panoramaMain" Title="MCText Viewer" SelectionChanged="Panorama_SelectionChanged">
             <controls:Panorama.Background>
                 <ImageBrush ImageSource="PanoramaBackground.png"/>
             </controls:Panorama.Background>
  
             <!--Panorama 항목 1-->
-            <controls:PanoramaItem Header="Text Library">
+            <controls:PanoramaItem Header="Text Library" 
+                                   HeaderTemplate="{StaticResource DropBoxItemHeader}"
+                                   Tag="panoItemTextLibrary">
                 <!--텍스트 줄 바꿈이 있는 이중선 목록-->
                 <ListBox Margin="0,0,-12,70" Name="lb_library" ItemTemplate="{StaticResource DataTemplate}" MouseLeftButtonUp="lb_library_MouseLeftButtonUp" />
             </controls:PanoramaItem>
 
             <!--Panorama 항목 2-->
-            <controls:PanoramaItem Header="Text Download">
+            <controls:PanoramaItem Header="Text Download" 
+                                   HeaderTemplate="{StaticResource DropBoxItemHeader}"
+                                   Tag="panoItemDropBoxDownload">
                 <!--텍스트 줄 바꿈이 있는 이중선 목록-->
                 <Grid>
                     <phone:WebBrowser Height="492" HorizontalAlignment="Left" Margin="0,0,0,0" Name="loginBrowser" VerticalAlignment="Top" Width="418" IsScriptEnabled="True" />
