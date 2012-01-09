@@ -1,35 +1,69 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Animation;
-using System.Windows.Shapes;
-using Microsoft.Phone.Controls;
+﻿
 
+
+using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.IO;
 using System.IO.IsolatedStorage;
-using System.Collections.ObjectModel;
-using MCTextViewer.ViewModels;
-using DropNet;
-using DropNet.Models;
-using DropNet.Helpers;
-using Microsoft.Phone.Shell;
-using System.Windows.Resources;
+using System.Linq;
+using System.Net;
 using System.Text.RegularExpressions;
 using System.Threading;
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Input;
+using System.Windows.Media;
+using System.Windows.Resources;
+using DropNet;
+using MCTextViewer.ViewModels;
+using Microsoft.Phone.Controls;
+using Microsoft.Phone.Shell;
+
+
 
 namespace MCTextViewer
 {
-    
     public partial class MainPage : PhoneApplicationPage
     {
-        bool dpfile = false;
+        #region Public Constructor
 
+        /// <summary>
+        /// MainPage 생성
+        /// </summary>
+        public MainPage()
+        {
+            InitializeComponent();
+
+            ApplicationBar = new ApplicationBar();
+            ApplicationBar.Mode = ApplicationBarMode.Minimized;
+            ApplicationBar.Opacity = 0.5;
+            seledtedDeleteButton.Text = "Delete";
+            seledtedViewButton.Text = "View";
+
+            ApplicationBar.Buttons.Add(seledtedViewButton);
+            ApplicationBar.Buttons.Add(seledtedDeleteButton);
+            seledtedDeleteButton.Click += new EventHandler(seledtedDeleteButton_Click);
+            seledtedViewButton.Click += new EventHandler(seledtedViewButton_Click);
+
+            //드롭박스 파일 다운로드 탭 초기화
+            InitTextFileDownloadTab();
+
+            //리스트박스 아이템 소스 지정
+            this.lb_library.ItemsSource = TextLists;
+            ReadFileList();
+
+            // ListBox 컨트롤의 데이터 컨텍스트를 샘플 데이터로 설정합니다.
+            //DataContext = App.ViewModel;
+            //this.Loaded += new RoutedEventHandler(MainPage_Loaded);
+        }
+
+        #endregion Public Constructor
+
+
+        private bool dpfile;
+
+        
         /**
          *  라이브러리 항목 리스트
          */
@@ -82,35 +116,8 @@ namespace MCTextViewer
             new Uri("/Images/delete-icon.png", UriKind.Relative));
         ApplicationBarIconButton seledtedViewButton = new ApplicationBarIconButton(
            new Uri("/Images/view-icon.png", UriKind.Relative));
-        // 생성자
-        public MainPage()
-        {
-            InitializeComponent();
-            
-            
-            ApplicationBar = new ApplicationBar();
-            ApplicationBar.Mode = ApplicationBarMode.Minimized;
-            ApplicationBar.Opacity = 0.5;
-            this.seledtedDeleteButton.Text = "Delete";
-            this.seledtedViewButton.Text = "View";
 
-            
-            ApplicationBar.Buttons.Add(seledtedViewButton);
-            ApplicationBar.Buttons.Add(seledtedDeleteButton);
-            seledtedDeleteButton.Click += new EventHandler(seledtedDeleteButton_Click);
-            seledtedViewButton.Click += new EventHandler(seledtedViewButton_Click);
-
-            //드롭박스 파일 다운로드 탭 초기화
-            InitTextFileDownloadTab();
-
-            //리스트박스 아이템 소스 지정
-            this.lb_library.ItemsSource = TextLists;
-            ReadFileList();
-
-            // ListBox 컨트롤의 데이터 컨텍스트를 샘플 데이터로 설정합니다.
-            //DataContext = App.ViewModel;
-            //this.Loaded += new RoutedEventHandler(MainPage_Loaded);
-        }
+        
 
         private void InitTextFileDownloadTab()
         {
