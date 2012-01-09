@@ -784,6 +784,6 @@ namespace MCTextViewer
                 closeani.Begin();
             });
         }
-
+        
     }
 }

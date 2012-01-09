@@ -17,6 +17,7 @@ using EUCKR_Unicode_Library;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.ComponentModel;
+using Microsoft.Phone.Shell;
 
 namespace MCTextViewer
 {
@@ -35,6 +36,9 @@ namespace MCTextViewer
         private bool isnewpage = false;
         private bool firstloading = false;
 
+        private int LINEWIDTHSIZE;
+        private int LINECOUNT;
+        
         public TextViewPage()
         {
             InitializeComponent();
@@ -74,15 +78,17 @@ namespace MCTextViewer
                 {
                     try
                     {
-                        
-
                         String readfile = "DownloadFiles\\" + this.fileName;
 
                         StreamReader sr = new StreamReader(new IsolatedStorageFileStream(readfile, FileMode.Open, file), Encoding.UTF8);
                         totalString = sr.ReadToEnd();
                         sr.Close();
 
-                        
+                        //화면 표시 글자수, 줄 수를 계산해놓음(폰트사이트 20기준, 한줄 44바이트, 28줄)
+                        //textviewblock.FontSize = 20;
+                        LINEWIDTHSIZE = 44 + (4 * (20 - (int)textviewblock.FontSize));
+                        LINECOUNT = 28 + (2 * (20 - (int)textviewblock.FontSize));
+
                     }
                     catch (IsolatedStorageException)
                     {
@@ -125,7 +131,7 @@ namespace MCTextViewer
                         tmppage += lines[i]+"\n";
                         linecnt++;
 
-                        if (linecnt >= 28)
+                        if (linecnt >= LINECOUNT)
                         {
                             pages.Add(tmppage);
                             tmppage = "";
@@ -168,7 +174,7 @@ namespace MCTextViewer
                                 charcnt++;
                             }
 
-                            if ((charcnt / 44) > 0)
+                            if ((charcnt / LINEWIDTHSIZE) > 0)
                             {
 
                                 line = line.Insert(j + 1, "\r\n");
@@ -193,7 +199,7 @@ namespace MCTextViewer
                             //}
 
                             linecnt++;
-                            if (linecnt >= 28)
+                            if (linecnt >= LINECOUNT)
                             {
                                 pages.Add(lineString);
                                 linecnt = 0;
@@ -201,7 +207,7 @@ namespace MCTextViewer
                             }
                         }
 
-                        if (linecnt >= 28)
+                        if (linecnt >= LINECOUNT)
                         {
                             pages.Add(lineString);
                             linecnt = 0;
@@ -261,10 +267,9 @@ namespace MCTextViewer
             //string loadingmsg = "Loading..";
             if (firstloading)
             {
-                
                 textLoadingMessage.Text = "First Loading.." + e.ProgressPercentage.ToString() + "%";
             }
-
+            
             textLoadingbar.Value = e.ProgressPercentage;
         }
 
@@ -515,6 +520,11 @@ namespace MCTextViewer
             {
                 textviewblock.Text = pages[textindex].ToString();
                 setpagevalue();
+
+                if (textindex != 0)
+                {
+                    IsolatedStorageSettings.ApplicationSettings[this.fileName] = textindex;
+                }
             }
         }
 
@@ -643,7 +653,8 @@ namespace MCTextViewer
             NavigationService.GoBack();
         }
 
-    
+
+       
 
  
     }
