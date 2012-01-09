@@ -66,10 +66,10 @@
         </DataTemplate>
 
         <!-- Panorama Items Header -->
-        <DataTemplate x:Key="DropBoxItemHeader">
+        <DataTemplate x:Key="PanoramaItemHeader">
             <Grid>
                 <ContentPresenter>
-                    <TextBlock Text="{Binding}" FontSize="62" />
+                    <TextBlock Text="{Binding}" FontSize="48" />
                 </ContentPresenter>
             </Grid>
         </DataTemplate>
@@ -86,15 +86,15 @@
  
             <!--Panorama 항목 1-->
             <controls:PanoramaItem Header="Text Library" 
-                                   HeaderTemplate="{StaticResource DropBoxItemHeader}"
+                                   HeaderTemplate="{StaticResource PanoramaItemHeader}"
                                    Tag="panoItemTextLibrary">
                 <!--텍스트 줄 바꿈이 있는 이중선 목록-->
                 <ListBox Margin="0,0,-12,70" Name="lb_library" ItemTemplate="{StaticResource DataTemplate}" MouseLeftButtonUp="lb_library_MouseLeftButtonUp" />
             </controls:PanoramaItem>
 
             <!--Panorama 항목 2-->
-            <controls:PanoramaItem Header="Text Download" 
-                                   HeaderTemplate="{StaticResource DropBoxItemHeader}"
+            <controls:PanoramaItem Header="DropBox Download" 
+                                   HeaderTemplate="{StaticResource PanoramaItemHeader}"
                                    Tag="panoItemDropBoxDownload">
                 <!--텍스트 줄 바꿈이 있는 이중선 목록-->
                 <Grid>
