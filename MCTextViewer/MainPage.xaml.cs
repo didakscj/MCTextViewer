@@ -275,6 +275,10 @@ namespace MCTextViewer
              //MessageBox.Show(libSelectedItemIndex.ToString());
             if (libSelectedItemIndex != -1)
             {
+                if (MessageBox.Show("Do you want to delete? \n"+libSelectedItem.Name, "Delete File", MessageBoxButton.OKCancel) == MessageBoxResult.Cancel)
+                {
+                    return;
+                }
                 //리스트에서 삭제
                 _textlists.RemoveAt(libSelectedItemIndex);
 
@@ -286,7 +290,14 @@ namespace MCTextViewer
                 if (dirs.Length != 0)
                 {
                     String deletefile = "DownloadFiles\\" + libSelectedItem.Name;
-                    file.DeleteFile(deletefile);
+                    try
+                    {
+                        file.DeleteFile(deletefile);
+                    }
+                    catch (Exception)
+                    {
+                        return;
+                    }
                 }
                 else
                 {

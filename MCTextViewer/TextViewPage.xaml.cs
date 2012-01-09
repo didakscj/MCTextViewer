@@ -32,12 +32,16 @@ namespace MCTextViewer
         private string totalString;
         private int readcount = 0;
 
+        private bool isnewpage = false;
+        private bool firstloading = false;
+
         public TextViewPage()
         {
             InitializeComponent();
             stackPanel1.Visibility = Visibility.Collapsed;
             textLoadingPanel.Visibility = Visibility.Visible;
             textLoadingbar.IsIndeterminate = true;
+            isnewpage = true;
             Touch.FrameReported += new TouchFrameEventHandler(Touch_FrameReported);
             
         }
@@ -93,14 +97,19 @@ namespace MCTextViewer
                 //popupmessage("Read File error");
             }
 
-            
-            makepage();
-            
+            if (isnewpage)
+            {
+                isnewpage = false;
+                makepage();
+            }
         }
         public void makepage()
         {
-
+            textLoadingbar.IsIndeterminate = false;
+            textLoadingbar.Value = 0;
+            textLoadingbar.Maximum = 100;
             var bw = new BackgroundWorker();
+            bw.WorkerReportsProgress = true;
             bw.DoWork += (s, a) =>
             {
                 //셋팅 읽어옴
@@ -122,11 +131,14 @@ namespace MCTextViewer
                             tmppage = "";
                             linecnt = 0;
                         }
+                        
+                        bw.ReportProgress(((i + 1) * 100) / lines.Length);
                     }
                     pages.Add(tmppage);
                 }
                 else
                 {   //처음 읽었을때
+                    firstloading = true;
                     //textviewblock.FontSize = 20;
                     string line;
                     string lineString = "";
@@ -195,19 +207,16 @@ namespace MCTextViewer
                             linecnt = 0;
                             lineString = "";
                         }
+                        bw.ReportProgress(((i + 1) * 100) / lines.Length);
                     }
                     pages.Add(lineString);
+                    firstloading = false;
                 }
-                
-                   
-                   
-             
             };
             bw.RunWorkerCompleted += (s, a) =>
             {
                 
-                textLoadingbar.IsIndeterminate = false;
-                textLoadingPanel.Visibility = Visibility.Collapsed;
+                
                 //페이지수가 결정됐으니까 슬라이더에 설정해놓음
                 pageslider.Maximum = pages.Count;
                 pageslider.Minimum = 1;
@@ -215,7 +224,7 @@ namespace MCTextViewer
                 //textLoadingbar.IsIndeterminate = false;
                 //textLoadingPanel.Visibility = Visibility.Collapsed;
 
-                stackPanel1.Visibility = Visibility.Visible;
+                
 
 
                 //셋팅 읽어옴
@@ -227,32 +236,78 @@ namespace MCTextViewer
                     // Thread savenewfile = new Thread(resavefile);
                     resavefile();
                 }
+                else
+                {
+                    textLoadingbar.IsIndeterminate = false;
+                    textLoadingPanel.Visibility = Visibility.Collapsed;
+                    stackPanel1.Visibility = Visibility.Visible;
+                    readText();
+                }
 
-                readText();
+                
      
 
             };
-            textLoadingbar.IsIndeterminate = true;
+            //textLoadingbar.IsIndeterminate = true;
             textLoadingPanel.Visibility = Visibility.Visible;
-          
+
+            bw.ProgressChanged += new ProgressChangedEventHandler(bw_ProgressChanged);
             bw.RunWorkerAsync();
+            
+        }
+
+        void bw_ProgressChanged(object sender, ProgressChangedEventArgs e)
+        {
+            //string loadingmsg = "Loading..";
+            if (firstloading)
+            {
+                
+                textLoadingMessage.Text = "First Loading.." + e.ProgressPercentage.ToString() + "%";
+            }
+
+            textLoadingbar.Value = e.ProgressPercentage;
         }
 
         public void resavefile()
         {
-            IsolatedStorageFile file;
-            file = IsolatedStorageFile.GetUserStoreForApplication();
-            StreamWriter sw = new StreamWriter(new IsolatedStorageFileStream("DownloadFiles\\" + this.fileName, FileMode.Create, file));
-            String totalString = "";
-             
-            for (int i = 0; i < pages.Count; i++)
+            var bw = new BackgroundWorker();
+            bw.WorkerReportsProgress = true;
+            textLoadingMessage.Text = "File saving..";
+            textLoadingbar.IsIndeterminate = false;
+            textLoadingbar.Value = 0;
+            textLoadingbar.Maximum = 100;
+
+            bw.DoWork += (s, a) =>
             {
-                totalString += pages[i].ToString();
-            }
+                IsolatedStorageFile file;
+                file = IsolatedStorageFile.GetUserStoreForApplication();
+                StreamWriter sw = new StreamWriter(new IsolatedStorageFileStream("DownloadFiles\\" + this.fileName, FileMode.Create, file));
+                String totalString = "";
 
-            sw.Write(totalString);
+                for (int i = 0; i < pages.Count; i++)
+                {
+                    totalString += pages[i].ToString();
+                    bw.ReportProgress(((i + 1) * 100) / pages.Count);
+                }
 
-            sw.Close();
+                sw.Write(totalString);
+                sw.Close();
+            };
+
+            bw.RunWorkerCompleted += (s, a) =>
+            {
+                //MessageBox.Show("Resave completed");
+                textLoadingbar.IsIndeterminate = false;
+                textLoadingPanel.Visibility = Visibility.Collapsed;
+                textviewblock.Visibility = Visibility.Visible;
+                stackPanel1.Visibility = Visibility.Visible;
+                readText();
+            };
+
+            textviewblock.Visibility = Visibility.Collapsed;
+            bw.ProgressChanged += new ProgressChangedEventHandler(bw_ProgressChanged);
+            bw.RunWorkerAsync();
+            
         }
 
         //public void makepage()
@@ -565,11 +620,15 @@ namespace MCTextViewer
 
         private void LayoutRoot_Unloaded(object sender, RoutedEventArgs e)
         {
-            IsolatedStorageSettings.ApplicationSettings["LAST_VIEW_TEXT"] = this.fileName;
-            IsolatedStorageSettings.ApplicationSettings[this.fileName] = textindex;
-            IsolatedStorageSettings.ApplicationSettings[this.fileName + "readcount"] = ++readcount;
-
+            if (!firstloading)
+            {
+                IsolatedStorageSettings.ApplicationSettings["LAST_VIEW_TEXT"] = this.fileName;
+                IsolatedStorageSettings.ApplicationSettings[this.fileName] = textindex;
+                IsolatedStorageSettings.ApplicationSettings[this.fileName + "readcount"] = ++readcount;
+            }
+           
             Touch.FrameReported -= new TouchFrameEventHandler(Touch_FrameReported);
+            isnewpage = false;
         }
 
         private void pageslider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
