@@ -52,6 +52,8 @@ namespace MCTextViewer
             //리스트박스 아이템 소스 지정
             this.lb_library.ItemsSource = TextLists;
             ReadFileList();
+            if (TextLists.Count == 0)
+                ApplicationBar.IsVisible = false;
 
             // ListBox 컨트롤의 데이터 컨텍스트를 샘플 데이터로 설정합니다.
             //DataContext = App.ViewModel;
@@ -223,21 +225,40 @@ namespace MCTextViewer
             switch (panoItemTag)
             {
                 case "panoItemTextLibrary":
-                    ApplicationBar.Mode = ApplicationBarMode.Default;
-                    //ApplicationBarMenuItem menuitem = new ApplicationBarMenuItem("menu|");
-                    //ApplicationBar.Buttons.Add(seledtedDeleteButton);
-                    ApplicationBar.IsVisible = true;
-                    ApplicationBar.Mode = ApplicationBarMode.Minimized;
-                    ReadFileList();
+                    ActivateTextLibraryPanoramaItem();
                     break;
 
                 case "panoItemDropBoxDownload":
-                    ApplicationBar.IsVisible = false;
-                    if (!DropboxConnected)
-                        DropboxConnect();
-
+                    ActivateDropBoxDownLoadPanoramaItem();
                     break;
             }
+        }
+
+        /// <summary>
+        /// Text Library 파노라마 아이템 활성화
+        /// </summary>
+        private void ActivateTextLibraryPanoramaItem()
+        {
+            ReadFileList();
+
+            if (_textlists.Count == 0)
+                return;
+
+            ApplicationBar.Mode = ApplicationBarMode.Default;
+            //ApplicationBarMenuItem menuitem = new ApplicationBarMenuItem("menu|");
+            //ApplicationBar.Buttons.Add(seledtedDeleteButton);
+            ApplicationBar.IsVisible = true;
+            ApplicationBar.Mode = ApplicationBarMode.Minimized;
+        }
+
+        /// <summary>
+        /// DropBox Library 파노라마 아이템 활성화
+        /// </summary>
+        private void ActivateDropBoxDownLoadPanoramaItem()
+        {
+            ApplicationBar.IsVisible = false;
+            if (!DropboxConnected)
+                DropboxConnect();
         }
 
         #endregion Private Instance Method
@@ -275,17 +296,16 @@ namespace MCTextViewer
             }
         }
 
-        void seledtedDeleteButton_Click(object sender, EventArgs e)
+        private void seledtedDeleteButton_Click(object sender, EventArgs e)
         {
             LibraryDataList libSelectedItem = (LibraryDataList)lb_library.SelectedItem;
             int libSelectedItemIndex = lb_library.SelectedIndex;
-             //MessageBox.Show(libSelectedItemIndex.ToString());
+            
             if (libSelectedItemIndex != -1)
             {
-                if (MessageBox.Show("Do you want to delete? \n"+libSelectedItem.Name, "Delete File", MessageBoxButton.OKCancel) == MessageBoxResult.Cancel)
-                {
+                if (MessageBox.Show("Do you want to delete? \n" + libSelectedItem.Name, "Delete File", MessageBoxButton.OKCancel) == MessageBoxResult.Cancel)
                     return;
-                }
+
                 //리스트에서 삭제
                 _textlists.RemoveAt(libSelectedItemIndex);
 
@@ -301,14 +321,15 @@ namespace MCTextViewer
                     {
                         file.DeleteFile(deletefile);
                     }
-                    catch (Exception)
+                    catch (Exception ex)
                     {
+                        string errMsg = string.Format("{0}\n\n{1}", ex.Message, ex);
+                        MessageBox.Show(errMsg, "Delete Error", MessageBoxButton.OK);
                         return;
                     }
                 }
                 else
                 {
-                    //MessageBox.Show("Fail: Delete File");
                     popupmessage("Delete File error");
                 }
 
@@ -325,9 +346,9 @@ namespace MCTextViewer
 
                 ApplicationBar.Mode = ApplicationBarMode.Minimized;
                 ReadFileList();
+                if (_textlists.Count == 0)
+                    ApplicationBar.IsVisible = false;
             }
-
-
         }
 
         /**
