@@ -110,6 +110,16 @@
                     <StackPanel Height="11" HorizontalAlignment="Left" Margin="143,341,0,0" Name="downloadLoadingPanel" VerticalAlignment="Top" Width="217" />    
                 </Grid>
             </controls:PanoramaItem>
+            <!--Panorama 항목 3-->
+            <controls:PanoramaItem Header="Settings" 
+                                   HeaderTemplate="{StaticResource DropBoxItemHeader}"
+                                   Tag="panoItemSettings">
+                <Grid Background="#3EFFFFFF" Margin="0,0,0,65">
+                    <Slider Height="92" HorizontalAlignment="Center" Margin="148,48,15,306" Name="setting_fontsize_slider" VerticalAlignment="Center" Width="257" SmallChange="1" Minimum="15" Maximum="25" ValueChanged="setting_fontsize_slider_ValueChanged" />
+                    <TextBlock Height="30" HorizontalAlignment="Left" Margin="32,65,0,0" Name="setting_fontsize_name" Text="FontSize" VerticalAlignment="Top" Width="79" />
+                    <TextBlock Height="31" HorizontalAlignment="Left" Margin="101,65,0,0" Name="setting_fontsize_num" Text="0" VerticalAlignment="Top" Width="68" TextAlignment="Center" />
+                </Grid>
+            </controls:PanoramaItem>
         </controls:Panorama>
         <StackPanel x:Name="popupPanel" Height="31" VerticalAlignment="Top" Margin="0,-31,0,0" Opacity="0.8" RenderTransformOrigin="0.5,0.5" Background="#FF020202">
             <StackPanel.RenderTransform>
@@ -117,5 +127,6 @@
             </StackPanel.RenderTransform>
             <TextBlock x:Name="poptext" Height="31" TextWrapping="Wrap" Text=""/>
         </StackPanel>
+        
     </Grid>
 </phone:PhoneApplicationPage>

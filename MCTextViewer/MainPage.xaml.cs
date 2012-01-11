@@ -153,6 +153,26 @@ namespace MCTextViewer
         //        App.ViewModel.LoadData();
         //    }
         //}
+        /**
+         *  어플 셋팅 읽기 
+         */
+        public void ReadSettings()
+        {
+            
+            try
+            {
+               
+                setting_fontsize_slider.Value = (int)IsolatedStorageSettings.ApplicationSettings["Appsetting_fontsize"];
+                setting_fontsize_num.Text = setting_fontsize_slider.Value.ToString();
+            }
+            catch (KeyNotFoundException)
+            {
+                //없으면 말고
+                setting_fontsize_slider.Value = 20;
+                setting_fontsize_num.Text = setting_fontsize_slider.Value.ToString();
+            }
+        }
+
 
         /**
          *  격리 저장장소의 파일 리스트 읽기 
@@ -229,6 +249,9 @@ namespace MCTextViewer
                     if (!DropboxConnected)
                         DropboxConnect();
 
+                    break;
+                case "panoItemSettings":
+                    ReadSettings();
                     break;
             }
         }
@@ -783,6 +806,21 @@ namespace MCTextViewer
             {
                 closeani.Begin();
             });
+        }
+
+        private void setting_fontsize_slider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        {
+            try
+            {
+                int val = (int)setting_fontsize_slider.Value;
+                setting_fontsize_num.Text = val.ToString();
+                IsolatedStorageSettings.ApplicationSettings["Appsetting_fontsize"] = val;
+
+            }
+            catch (Exception)
+            {
+                //예외는 무시
+            }
         }
         
     }

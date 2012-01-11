@@ -1,23 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Animation;
-using System.Windows.Shapes;
-using Microsoft.Phone.Controls;
-using System.IO.IsolatedStorage;
-using System.IO;
-using System.Text;
-using EUCKR_Unicode_Library;
-using System.Text.RegularExpressions;
-using System.Threading;
 using System.ComponentModel;
-using Microsoft.Phone.Shell;
+using System.IO;
+using System.IO.IsolatedStorage;
+using System.Text;
+using System.Text.RegularExpressions;
+using System.Windows;
+using System.Windows.Input;
+using Microsoft.Phone.Controls;
 
 namespace MCTextViewer
 {
@@ -33,11 +23,16 @@ namespace MCTextViewer
         private string totalString;
         private int readcount = 0;
 
+        //기본 20
+        private int textfontsize = 20;
+
         private bool isnewpage = false;
-        private bool firstloading = false;
+        private bool fontsizechanging = false;
 
         private int LINEWIDTHSIZE;
         private int LINECOUNT;
+        private bool FONTSIZECHANGED = false;
+       
         
         public TextViewPage()
         {
@@ -69,37 +64,31 @@ namespace MCTextViewer
             
             if (NavigationContext.QueryString.TryGetValue("data", out this.fileName))
             {
-
-                //저장장소파일
-                IsolatedStorageFile file = IsolatedStorageFile.GetUserStoreForApplication();
-                
-                string[] dirs = file.GetDirectoryNames("DownloadFiles");
-                if (dirs.Length != 0)
+                //화면 표시 글자수, 줄 수를 계산해놓음(폰트사이트 20기준, 한줄 44바이트, 28줄)
+                try
                 {
-                    try
-                    {
-                        String readfile = "DownloadFiles\\" + this.fileName;
-
-                        StreamReader sr = new StreamReader(new IsolatedStorageFileStream(readfile, FileMode.Open, file), Encoding.UTF8);
-                        totalString = sr.ReadToEnd();
-                        sr.Close();
-
-                        //화면 표시 글자수, 줄 수를 계산해놓음(폰트사이트 20기준, 한줄 44바이트, 28줄)
-                        //textviewblock.FontSize = 20;
-                        LINEWIDTHSIZE = 44 + (4 * (20 - (int)textviewblock.FontSize));
-                        LINECOUNT = 28 + (2 * (20 - (int)textviewblock.FontSize));
-
-                    }
-                    catch (IsolatedStorageException)
-                    {
-                        NavigationService.GoBack();
-                        return;
-                    }
+                    textviewblock.FontSize = (int)IsolatedStorageSettings.ApplicationSettings["Appsetting_fontsize"];
                 }
+                catch (Exception)
+                {
+                    textviewblock.FontSize = 20;
+                }
+                LINEWIDTHSIZE = 44 + (4 * (20 - (int)textviewblock.FontSize));
+                LINECOUNT = 28 + (2 * (20 - (int)textviewblock.FontSize));
+
+                //셋팅 읽어옴
+                readsetting();
+                if (textfontsize != (int)textviewblock.FontSize)
+                {
+                    //폰트설정이 바뀜
+                    readcount = 0;
+                    FONTSIZECHANGED = true;
+                }
+                
             }
             else
             {
-                MessageBox.Show("Fail: Delete File");
+                MessageBox.Show("Read File error");
                 //popupmessage("Read File error");
             }
 
@@ -109,6 +98,34 @@ namespace MCTextViewer
                 makepage();
             }
         }
+
+        private void readFile()
+        {
+            //저장장소파일
+            IsolatedStorageFile file = IsolatedStorageFile.GetUserStoreForApplication();
+            string[] dirs = file.GetDirectoryNames("DownloadFiles");
+            if (dirs.Length != 0)
+            {
+                try
+                {
+                    String readfile = "DownloadFiles\\" + this.fileName;
+                    if (readcount > 0)
+                    {
+                        readfile = "DownloadFiles\\ResavedFiles\\" + this.fileName + "_resave";
+                    }
+
+                    StreamReader sr = new StreamReader(new IsolatedStorageFileStream(readfile, FileMode.Open, file), Encoding.UTF8);
+                    totalString = sr.ReadToEnd();
+                    sr.Close();
+                }
+                catch (IsolatedStorageException)
+                {
+                    //NavigationService.GoBack();
+                    return;
+                }
+            }
+        }
+
         public void makepage()
         {
             textLoadingbar.IsIndeterminate = false;
@@ -118,8 +135,10 @@ namespace MCTextViewer
             bw.WorkerReportsProgress = true;
             bw.DoWork += (s, a) =>
             {
-                //셋팅 읽어옴
-                readsetting();
+               
+                //파일 읽어옴
+                readFile();
+
                 if (readcount > 0)
                 {
                     //처음 읽는게 아님
@@ -144,79 +163,10 @@ namespace MCTextViewer
                 }
                 else
                 {   //처음 읽었을때
-                    firstloading = true;
-                    //textviewblock.FontSize = 20;
-                    string line;
-                    string lineString = "";
-                    int linecnt = 0;
-                    Dispatcher.BeginInvoke(() =>
-                    {
-                        textLoadingMessage.Text = "First Loading..";
-                    });
-                    string[] lines = Regex.Split(totalString, "\r\n");
-                    totalString = "";
+                    fontsizechanging = true;
 
-                    for (int i = 0; i < lines.Length; i++)
-                    {
-                        int charcnt = 0;
-                        line = lines[i];
-                        for (int j = 0; j < line.Length; j++)
-                        {
-
-                            int bytecnt = Encoding.UTF8.GetByteCount(line[j].ToString());
-                            if (bytecnt == 3)
-                            {
-                                //한글인경우 2글자로 취급
-                                charcnt += 2;
-                            }
-                            else
-                            {
-                                charcnt++;
-                            }
-
-                            if ((charcnt / LINEWIDTHSIZE) > 0)
-                            {
-
-                                line = line.Insert(j + 1, "\r\n");
-                                charcnt = 0;
-                                j++;
-                            }
-
-                        }
-
-                        string[] tmplines = Regex.Split(line, "\r\n");
-                        //linecnt += tmplines.Length;
-                        for (int k = 0; k < tmplines.Length; k++)
-                        {
-                            lineString += tmplines[k] + "\r\n";
-                            //if (k == tmplines.Length - 1 && tmplines.Length > 1)
-                            //{
-                            //    //
-                            //}
-                            //else
-                            //{
-                            //    lineString += "\n";
-                            //}
-
-                            linecnt++;
-                            if (linecnt >= LINECOUNT)
-                            {
-                                pages.Add(lineString);
-                                linecnt = 0;
-                                lineString = "";
-                            }
-                        }
-
-                        if (linecnt >= LINECOUNT)
-                        {
-                            pages.Add(lineString);
-                            linecnt = 0;
-                            lineString = "";
-                        }
-                        bw.ReportProgress(((i + 1) * 100) / lines.Length);
-                    }
-                    pages.Add(lineString);
-                    firstloading = false;
+                    changeLineforFont(bw);
+                    fontsizechanging = false;
                 }
             };
             bw.RunWorkerCompleted += (s, a) =>
@@ -237,10 +187,11 @@ namespace MCTextViewer
                 readsetting();
 
                 //처음 보는거면 파일 다시 저장
-                if (readcount == 0)
+                if (readcount == 0 || FONTSIZECHANGED)
                 {
                     // Thread savenewfile = new Thread(resavefile);
                     resavefile();
+                    
                 }
                 else
                 {
@@ -259,18 +210,231 @@ namespace MCTextViewer
 
             bw.ProgressChanged += new ProgressChangedEventHandler(bw_ProgressChanged);
             bw.RunWorkerAsync();
-            
+            IsolatedStorageSettings.ApplicationSettings[this.fileName + "fff"] = (int)textviewblock.FontSize;
         }
 
         void bw_ProgressChanged(object sender, ProgressChangedEventArgs e)
         {
             //string loadingmsg = "Loading..";
-            if (firstloading)
+            if (fontsizechanging)
             {
-                textLoadingMessage.Text = "First Loading.." + e.ProgressPercentage.ToString() + "%";
+                textLoadingMessage.Text = "Font size change.." + e.ProgressPercentage.ToString() + "%";
             }
             
             textLoadingbar.Value = e.ProgressPercentage;
+        }
+
+        private void changeLineforFont(BackgroundWorker bw)
+        {
+            int bytecount = 0;
+            int charcnt = 0;
+            int stringIndex = 0;
+            int linecnt = 0;
+            string tmpstring = "";
+            for (int i = 0; i < totalString.Length; i++)
+            {
+                string templine = "";
+                int bytecnt = Encoding.UTF8.GetByteCount(totalString[i].ToString());
+                if (bytecnt == 3)
+                {
+                    //한글인경우 2글자로 취급
+                    bytecount += 2;
+                }
+                else
+                {
+                    bytecount++;
+                }
+                charcnt++;
+
+                if (totalString[i].ToString() == "\n" || (bytecount / LINEWIDTHSIZE) > 0)
+                {
+                    try
+                    {
+
+                        templine = totalString.Substring(stringIndex, charcnt);
+                        int jj = 0;
+                    }
+                    catch (ArgumentOutOfRangeException)
+                    {
+
+                        templine = totalString.Substring(stringIndex, totalString.Length - stringIndex);
+                        break;
+                    }
+                    stringIndex += charcnt;
+                    tmpstring += templine;
+                    if (totalString[i].ToString() != "\n")
+                    {
+                        tmpstring += "\n";
+                    }
+                    charcnt = 0;
+                    bytecount = 0;
+                    linecnt++;
+                }
+                if (linecnt >= LINECOUNT)
+                {
+
+                    pages.Add(tmpstring);
+                    tmpstring = "";
+                    linecnt = 0;
+                }
+                if(i%10000 == 0)
+                bw.ReportProgress(((i + 1) * 100) / totalString.Length);
+            }
+            pages.Add(tmpstring);
+            totalString = "";
+            //string line;
+            //string lineString = "";
+            //int linecnt = 0;
+            
+            //string[] lines = Regex.Split(totalString, "\r\n");
+            // totalString = "";
+            //int cnt = 0;
+            //int charcnt2 = 0;
+            //int ccnt = 0;
+            //int linecnt2 = 0;
+            //string temp = "";
+            //int stringIndex = 0;
+            //while (true)
+            //{
+            //    string dddd = "";
+            //    if (cnt >= totalString.Length)
+            //    {
+            //        pages.Add(temp);
+            //        break;
+            //    }
+
+                
+               
+            //    int bytecnt = Encoding.UTF8.GetByteCount(totalString[cnt].ToString());
+            //    if (bytecnt == 3)
+            //    {
+            //        //한글인경우 2글자로 취급
+            //        charcnt2 += 2;
+
+            //    }
+            //    else
+            //    {
+            //        charcnt2++;
+            //    }
+            //    ccnt++; 
+            //    if (totalString[cnt].ToString() == "\n")
+            //    {
+            //        try
+            //        {
+
+            //            dddd = totalString.Substring(stringIndex,  ccnt);
+            //            int jj = 0;
+            //        }
+            //        catch (ArgumentOutOfRangeException)
+            //        {
+
+            //            dddd = totalString.Substring(stringIndex, totalString.Length - stringIndex);
+            //            break;
+            //        }
+            //        stringIndex += ccnt;
+            //        temp += dddd;
+            //        ccnt = 0;
+            //        charcnt2 = 0;
+            //        linecnt2++;
+            //    }
+            //    else if ((charcnt2 / LINEWIDTHSIZE) > 0 )
+            //    {
+
+                        
+            //        try
+            //        {
+
+            //            dddd = totalString.Substring(stringIndex, ccnt);
+            //            int jj = 0;
+            //        }
+            //        catch (ArgumentOutOfRangeException)
+            //        {
+                            
+            //            dddd = totalString.Substring(stringIndex, totalString.Length - stringIndex);
+            //            break;
+            //        }
+            //        stringIndex += ccnt;
+            //        temp += dddd;
+            //        temp += "\n";
+            //        charcnt2 = 0;
+            //        ccnt = 0;
+            //        linecnt2++;
+            //    }
+               
+            //    if (linecnt2 >= LINECOUNT)
+            //    {
+
+            //        pages.Add(temp);
+            //        temp = "";
+            //        //int aa = totalString.Length / cnt;
+            //        linecnt2 = 0;
+            //    }
+            //    cnt++;
+                
+               
+            //}
+            //return;
+
+            //for (int i = 0; i < lines.Length; i++)
+            //{
+            //    int charcnt = 0;
+            //    line = lines[i];
+            //    for (int j = 0; j < line.Length; j++)
+            //    {
+
+            //        int bytecnt = Encoding.UTF8.GetByteCount(line[j].ToString());
+            //        if (bytecnt == 3)
+            //        {
+            //            //한글인경우 2글자로 취급
+            //            charcnt += 2;
+            //        }
+            //        else
+            //        {
+            //            charcnt++;
+            //        }
+
+            //        if ((charcnt / LINEWIDTHSIZE) > 0)
+            //        {
+
+            //            line = line.Insert(j + 1, "\r\n");
+            //            charcnt = 0;
+            //            j++;
+            //        }
+
+            //    }
+
+            //    string[] tmplines = Regex.Split(line, "\r\n");
+            //    //linecnt += tmplines.Length;
+            //    for (int k = 0; k < tmplines.Length; k++)
+            //    {
+            //        lineString += tmplines[k] + "\r\n";
+            //        //if (k == tmplines.Length - 1 && tmplines.Length > 1)
+            //        //{
+            //        //    //
+            //        //}
+            //        //else
+            //        //{
+            //        //    lineString += "\n";
+            //        //}
+
+            //        linecnt++;
+            //        if (linecnt >= LINECOUNT)
+            //        {
+            //            pages.Add(lineString);
+            //            linecnt = 0;
+            //            lineString = "";
+            //        }
+            //    }
+
+            //    if (linecnt >= LINECOUNT)
+            //    {
+            //        pages.Add(lineString);
+            //        linecnt = 0;
+            //        lineString = "";
+            //    }
+            //    bw.ReportProgress(((i + 1) * 100) / lines.Length);
+            //}
+            //pages.Add(lineString);
         }
 
         public void resavefile()
@@ -286,12 +450,20 @@ namespace MCTextViewer
             {
                 IsolatedStorageFile file;
                 file = IsolatedStorageFile.GetUserStoreForApplication();
-                StreamWriter sw = new StreamWriter(new IsolatedStorageFileStream("DownloadFiles\\" + this.fileName, FileMode.Create, file));
+
+                string[] dirs = file.GetDirectoryNames("DownloadFiles\\ResavedFiles");
+                if (dirs.Length == 0)
+                {
+                    file.CreateDirectory("DownloadFiles\\ResavedFiles");
+                }
+
+                StreamWriter sw = new StreamWriter(new IsolatedStorageFileStream("DownloadFiles\\ResavedFiles\\" + this.fileName + "_resave", FileMode.Create, file));
                 String totalString = "";
 
                 for (int i = 0; i < pages.Count; i++)
                 {
                     totalString += pages[i].ToString();
+                    
                     bw.ReportProgress(((i + 1) * 100) / pages.Count);
                 }
 
@@ -301,11 +473,13 @@ namespace MCTextViewer
 
             bw.RunWorkerCompleted += (s, a) =>
             {
+                
                 //MessageBox.Show("Resave completed");
                 textLoadingbar.IsIndeterminate = false;
                 textLoadingPanel.Visibility = Visibility.Collapsed;
                 textviewblock.Visibility = Visibility.Visible;
                 stackPanel1.Visibility = Visibility.Visible;
+                
                 readText();
             };
 
@@ -505,6 +679,7 @@ namespace MCTextViewer
             {
                 readcount = (int)IsolatedStorageSettings.ApplicationSettings[this.fileName + "readcount"];
                 textindex = (int)IsolatedStorageSettings.ApplicationSettings[this.fileName];
+                textfontsize = (int)IsolatedStorageSettings.ApplicationSettings[this.fileName + "fff"];
                 
             }
             catch (Exception)
@@ -630,11 +805,12 @@ namespace MCTextViewer
 
         private void LayoutRoot_Unloaded(object sender, RoutedEventArgs e)
         {
-            if (!firstloading)
+            if (!fontsizechanging)
             {
                 IsolatedStorageSettings.ApplicationSettings["LAST_VIEW_TEXT"] = this.fileName;
                 IsolatedStorageSettings.ApplicationSettings[this.fileName] = textindex;
                 IsolatedStorageSettings.ApplicationSettings[this.fileName + "readcount"] = ++readcount;
+                IsolatedStorageSettings.ApplicationSettings[this.fileName + "fff"] = (int)textviewblock.FontSize;
             }
            
             Touch.FrameReported -= new TouchFrameEventHandler(Touch_FrameReported);
