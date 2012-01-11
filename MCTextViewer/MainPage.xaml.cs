@@ -35,17 +35,6 @@ namespace MCTextViewer
         {
             InitializeComponent();
 
-            ApplicationBar = new ApplicationBar();
-            ApplicationBar.Mode = ApplicationBarMode.Minimized;
-            ApplicationBar.Opacity = 0.5;
-            seledtedDeleteButton.Text = "Delete";
-            seledtedViewButton.Text = "View";
-
-            ApplicationBar.Buttons.Add(seledtedViewButton);
-            ApplicationBar.Buttons.Add(seledtedDeleteButton);
-            seledtedDeleteButton.Click += new EventHandler(seledtedDeleteButton_Click);
-            seledtedViewButton.Click += new EventHandler(seledtedViewButton_Click);
-
             //드롭박스 파일 다운로드 탭 초기화
             InitTextFileDownloadTab();
 
@@ -54,10 +43,6 @@ namespace MCTextViewer
             ReadFileList();
             if (TextLists.Count == 0)
                 ApplicationBar.IsVisible = false;
-
-            // ListBox 컨트롤의 데이터 컨텍스트를 샘플 데이터로 설정합니다.
-            //DataContext = App.ViewModel;
-            //this.Loaded += new RoutedEventHandler(MainPage_Loaded);
         }
 
         #endregion Public Constructor
@@ -113,11 +98,6 @@ namespace MCTextViewer
 
         String DropboxUserToken = "";
         String DropboxScretToken = "";
-
-        ApplicationBarIconButton seledtedDeleteButton = new ApplicationBarIconButton(
-            new Uri("/Images/delete-icon.png", UriKind.Relative));
-        ApplicationBarIconButton seledtedViewButton = new ApplicationBarIconButton(
-           new Uri("/Images/view-icon.png", UriKind.Relative));
 
         
 
@@ -264,35 +244,16 @@ namespace MCTextViewer
         #endregion Private Instance Method
 
 
-        private void lb_library_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
-        {
-            //LibraryDataList libSelectedItem = (LibraryDataList)lb_library.SelectedItem;
-            //int libSelectedItemIndex = lb_library.SelectedIndex;
+        #region Private Event Handler
 
-            ApplicationBar.Mode = ApplicationBarMode.Default;
-
-        }
-
-        /// <summary>
-        /// 선택된 PanoramaItem 변경 시
-        /// </summary>
-        /// <param name="sender"> Panorama Control </param>
-        /// <param name="e"> SelecionChanged 이벤트 정보 </param>
-        private void Panorama_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            ActivateSelectedPanoramaItem();
-        }
-
-        void seledtedViewButton_Click(object sender, EventArgs e)
+        private void seledtedViewButton_Click(object sender, EventArgs e)
         {
             LibraryDataList libSelectedItem = (LibraryDataList)lb_library.SelectedItem;
             int libSelectedItemIndex = lb_library.SelectedIndex;
-            //MessageBox.Show(libSelectedItemIndex.ToString());
+            
             if (libSelectedItemIndex != -1)
             {
-                NavigationService.Navigate(new Uri("/TextViewPage.xaml?data="+libSelectedItem.Name, UriKind.Relative));
-
-                
+                NavigationService.Navigate(new Uri("/TextViewPage.xaml?data=" + libSelectedItem.Name, UriKind.Relative));
             }
         }
 
@@ -300,7 +261,7 @@ namespace MCTextViewer
         {
             LibraryDataList libSelectedItem = (LibraryDataList)lb_library.SelectedItem;
             int libSelectedItemIndex = lb_library.SelectedIndex;
-            
+
             if (libSelectedItemIndex != -1)
             {
                 if (MessageBox.Show("Do you want to delete? \n" + libSelectedItem.Name, "Delete File", MessageBoxButton.OKCancel) == MessageBoxResult.Cancel)
@@ -350,6 +311,30 @@ namespace MCTextViewer
                     ApplicationBar.IsVisible = false;
             }
         }
+
+        /// <summary>
+        /// 선택된 PanoramaItem 변경 시
+        /// </summary>
+        /// <param name="sender"> Panorama Control </param>
+        /// <param name="e"> SelecionChanged 이벤트 정보 </param>
+        private void Panorama_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            ActivateSelectedPanoramaItem();
+        }
+
+        #endregion Private Event Handler
+
+
+        private void lb_library_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+        {
+            //LibraryDataList libSelectedItem = (LibraryDataList)lb_library.SelectedItem;
+            //int libSelectedItemIndex = lb_library.SelectedIndex;
+
+            ApplicationBar.Mode = ApplicationBarMode.Default;
+
+        }
+
+        
 
         /**
          * 드롭박스 접속

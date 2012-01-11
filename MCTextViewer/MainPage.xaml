@@ -118,4 +118,13 @@
             <TextBlock x:Name="poptext" Height="31" TextWrapping="Wrap" Text=""/>
         </StackPanel>
     </Grid>
+
+    <!-- Showing usage of ApplicationBar-->
+    <phone:PhoneApplicationPage.ApplicationBar>
+        <shell:ApplicationBar IsVisible="True" IsMenuEnabled="True" Opacity="0.5" Mode="Minimized">
+            <shell:ApplicationBarIconButton IconUri="Images/view-icon.png" Text="View" Click="seledtedViewButton_Click"/>
+            <shell:ApplicationBarIconButton IconUri="Images/delete-icon.png" Text="Delete" Click="seledtedDeleteButton_Click"/>
+        </shell:ApplicationBar>
+    </phone:PhoneApplicationPage.ApplicationBar>
+    
 </phone:PhoneApplicationPage>
