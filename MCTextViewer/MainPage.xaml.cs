@@ -251,6 +251,7 @@ namespace MCTextViewer
 
                     break;
                 case "panoItemSettings":
+                    ApplicationBar.IsVisible = false;
                     ReadSettings();
                     break;
             }
