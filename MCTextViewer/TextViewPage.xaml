@@ -40,7 +40,7 @@
                         <PlaneProjection/>
                     </StackPanel.Projection>
                     <Grid>
-                    <Rectangle x:Name="rectangle" Stroke="White" Width="460" Opacity="1" RenderTransformOrigin="0.5,0.5" Margin="4,6,2,706" Fill="#B0000000">
+                    <Rectangle x:Name="rectangle" Stroke="White" Width="460" Opacity="1" RenderTransformOrigin="0.5,0.5" Margin="4,6,2,676" Fill="#B0000000">
                         <Rectangle.Projection>
                             <PlaneProjection />
                         </Rectangle.Projection>
@@ -48,8 +48,9 @@
                             <CompositeTransform />
                         </Rectangle.RenderTransform>
                     </Rectangle>
-                    <TextBlock Name="pageTextblock" Text="0/0" Width="172" Margin="146,6,148,708" TextAlignment="Center" FontSize="26" />
-                    <Slider Height="620" HorizontalAlignment="Right" Margin="0,48,390,0" Name="pageslider" VerticalAlignment="Top" Width="70" FlowDirection="LeftToRight" Orientation="Vertical" ValueChanged="pageslider_ValueChanged" Opacity="0.5">
+                    <TextBlock Name="pageTextName" Text="TextName" Width="381" Margin="43,6,42,708" TextAlignment="Center" FontSize="26" />
+                    <TextBlock Name="pageTextblock" Text="0/0" Width="172" Margin="148,41,146,676" TextAlignment="Center" FontSize="20" />
+                    <Slider Height="583" HorizontalAlignment="Right" Margin="0,85,390,0" Name="pageslider" VerticalAlignment="Top" Width="70" FlowDirection="LeftToRight" Orientation="Vertical" ValueChanged="pageslider_ValueChanged" Opacity="0.5">
                     	<Slider.Projection>
                     		<PlaneProjection RotationX="180"/>
                     	</Slider.Projection>

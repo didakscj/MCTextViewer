@@ -28,6 +28,7 @@ namespace MCTextViewer
 
         private bool isnewpage = false;
         private bool fontsizechanging = false;
+        private bool textloading = false;
 
         private int LINEWIDTHSIZE;
         private int LINECOUNT;
@@ -64,7 +65,8 @@ namespace MCTextViewer
             
             if (NavigationContext.QueryString.TryGetValue("data", out this.fileName))
             {
-                //화면 표시 글자수, 줄 수를 계산해놓음(폰트사이트 20기준, 한줄 44바이트, 28줄)
+                pageTextName.Text = this.fileName.ToString();
+                //화면 표시 글자수, 줄 수를 계산해놓음(폰트사이트 20기준, 한줄 46바이트, 28줄)
                 try
                 {
                     textviewblock.FontSize = (int)IsolatedStorageSettings.ApplicationSettings["Appsetting_fontsize"];
@@ -73,8 +75,18 @@ namespace MCTextViewer
                 {
                     textviewblock.FontSize = 20;
                 }
-                LINEWIDTHSIZE = 44 + (4 * (20 - (int)textviewblock.FontSize));
-                LINECOUNT = 28 + (2 * (20 - (int)textviewblock.FontSize));
+                if ((int)textviewblock.FontSize <= 20)
+                {
+                    LINEWIDTHSIZE = 46 + (4 * (20 - (int)textviewblock.FontSize));
+                    LINECOUNT = 28 + (2 * (20 - (int)textviewblock.FontSize));
+                }
+                else
+                {
+                    LINEWIDTHSIZE = 46 + (2 * (20 - (int)textviewblock.FontSize));
+                    LINECOUNT = 28 + (1 * (20 - (int)textviewblock.FontSize));
+                }
+
+                //LINECOUNT = 28 + (2 * (20 - (int)textviewblock.FontSize));
 
                 //셋팅 읽어옴
                 readsetting();
@@ -135,7 +147,7 @@ namespace MCTextViewer
             bw.WorkerReportsProgress = true;
             bw.DoWork += (s, a) =>
             {
-               
+                textloading = true;
                 //파일 읽어옴
                 readFile();
 
@@ -144,9 +156,10 @@ namespace MCTextViewer
                     //처음 읽는게 아님
                     int linecnt = 0;
                     string tmppage = "";
-                    string[] lines = Regex.Split(totalString, "\r\n");
+                    string[] lines = Regex.Split(totalString, "\n");
                     for (int i = 0; i < lines.Length; i++)
                     {
+                        
                         tmppage += lines[i]+"\n";
                         linecnt++;
 
@@ -168,6 +181,7 @@ namespace MCTextViewer
                     changeLineforFont(bw);
                     fontsizechanging = false;
                 }
+                
             };
             bw.RunWorkerCompleted += (s, a) =>
             {
@@ -198,11 +212,12 @@ namespace MCTextViewer
                     textLoadingbar.IsIndeterminate = false;
                     textLoadingPanel.Visibility = Visibility.Collapsed;
                     stackPanel1.Visibility = Visibility.Visible;
+                    textloading = false;
                     readText();
                 }
 
+
                 
-     
 
             };
             //textLoadingbar.IsIndeterminate = true;
@@ -210,7 +225,7 @@ namespace MCTextViewer
 
             bw.ProgressChanged += new ProgressChangedEventHandler(bw_ProgressChanged);
             bw.RunWorkerAsync();
-            IsolatedStorageSettings.ApplicationSettings[this.fileName + "fff"] = (int)textviewblock.FontSize;
+            IsolatedStorageSettings.ApplicationSettings[this.fileName + "textfontsize"] = (int)textviewblock.FontSize;
         }
 
         void bw_ProgressChanged(object sender, ProgressChangedEventArgs e)
@@ -258,7 +273,7 @@ namespace MCTextViewer
                     {
 
                         templine = totalString.Substring(stringIndex, totalString.Length - stringIndex);
-                        break;
+                    
                     }
                     stringIndex += charcnt;
                     tmpstring += templine;
@@ -280,8 +295,9 @@ namespace MCTextViewer
                 if(i%10000 == 0)
                 bw.ReportProgress(((i + 1) * 100) / totalString.Length);
             }
-            pages.Add(tmpstring);
-            totalString = "";
+
+            pages.Add(tmpstring+totalString.Substring(stringIndex, totalString.Length - stringIndex));
+            //totalString = "";
             //string line;
             //string lineString = "";
             //int linecnt = 0;
@@ -439,6 +455,7 @@ namespace MCTextViewer
 
         public void resavefile()
         {
+            textloading = true;
             var bw = new BackgroundWorker();
             bw.WorkerReportsProgress = true;
             textLoadingMessage.Text = "File saving..";
@@ -479,7 +496,7 @@ namespace MCTextViewer
                 textLoadingPanel.Visibility = Visibility.Collapsed;
                 textviewblock.Visibility = Visibility.Visible;
                 stackPanel1.Visibility = Visibility.Visible;
-                
+                textloading = false;
                 readText();
             };
 
@@ -679,7 +696,7 @@ namespace MCTextViewer
             {
                 readcount = (int)IsolatedStorageSettings.ApplicationSettings[this.fileName + "readcount"];
                 textindex = (int)IsolatedStorageSettings.ApplicationSettings[this.fileName];
-                textfontsize = (int)IsolatedStorageSettings.ApplicationSettings[this.fileName + "fff"];
+                textfontsize = (int)IsolatedStorageSettings.ApplicationSettings[this.fileName + "textfontsize"];
                 
             }
             catch (Exception)
@@ -765,6 +782,9 @@ namespace MCTextViewer
 
         private void LayoutRoot_Tap(object sender, GestureEventArgs e)
         {
+            //로딩중이면 무시
+            if (textloading) return;
+
             if (stackPanel1.Visibility == Visibility.Visible)
             {
                 menudownani.Begin();
@@ -810,8 +830,16 @@ namespace MCTextViewer
                 IsolatedStorageSettings.ApplicationSettings["LAST_VIEW_TEXT"] = this.fileName;
                 IsolatedStorageSettings.ApplicationSettings[this.fileName] = textindex;
                 IsolatedStorageSettings.ApplicationSettings[this.fileName + "readcount"] = ++readcount;
-                IsolatedStorageSettings.ApplicationSettings[this.fileName + "fff"] = (int)textviewblock.FontSize;
+                IsolatedStorageSettings.ApplicationSettings[this.fileName + "textfontsize"] = (int)textviewblock.FontSize;
             }
+            else
+            {
+                //MessageBox.Show("!");
+                IsolatedStorageSettings.ApplicationSettings["LAST_VIEW_TEXT"] = this.fileName;
+                IsolatedStorageSettings.ApplicationSettings[this.fileName + "readcount"] = 0;
+            }
+
+            
            
             Touch.FrameReported -= new TouchFrameEventHandler(Touch_FrameReported);
             isnewpage = false;
