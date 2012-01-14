@@ -33,7 +33,10 @@ namespace MCTextViewer
         private int LINEWIDTHSIZE;
         private int LINECOUNT;
         private bool FONTSIZECHANGED = false;
-       
+
+        private BackgroundWorker bw1 = new BackgroundWorker();
+        private BackgroundWorker bw2 = new BackgroundWorker();
+
         
         public TextViewPage()
         {
@@ -66,6 +69,8 @@ namespace MCTextViewer
             if (NavigationContext.QueryString.TryGetValue("data", out this.fileName))
             {
                 pageTextName.Text = this.fileName.ToString();
+                App._selectedtextfile = this.fileName.ToString();
+
                 //화면 표시 글자수, 줄 수를 계산해놓음(폰트사이트 20기준, 한줄 46바이트, 28줄)
                 try
                 {
@@ -77,12 +82,12 @@ namespace MCTextViewer
                 }
                 if ((int)textviewblock.FontSize <= 20)
                 {
-                    LINEWIDTHSIZE = 46 + (4 * (20 - (int)textviewblock.FontSize));
+                    LINEWIDTHSIZE = 45 + (4 * (20 - (int)textviewblock.FontSize));
                     LINECOUNT = 28 + (2 * (20 - (int)textviewblock.FontSize));
                 }
                 else
                 {
-                    LINEWIDTHSIZE = 46 + (2 * (20 - (int)textviewblock.FontSize));
+                    LINEWIDTHSIZE = 45 + (2 * (20 - (int)textviewblock.FontSize));
                     LINECOUNT = 28 + (1 * (20 - (int)textviewblock.FontSize));
                 }
 
@@ -143,9 +148,12 @@ namespace MCTextViewer
             textLoadingbar.IsIndeterminate = false;
             textLoadingbar.Value = 0;
             textLoadingbar.Maximum = 100;
-            var bw = new BackgroundWorker();
-            bw.WorkerReportsProgress = true;
-            bw.DoWork += (s, a) =>
+            //var bw = new BackgroundWorker();
+            bw1.WorkerReportsProgress = true;
+            bw1.WorkerSupportsCancellation = true;
+            try { bw1.CancelAsync(); }
+            catch (Exception) { }
+            bw1.DoWork += (s, a) =>
             {
                 textloading = true;
                 //파일 읽어옴
@@ -170,7 +178,7 @@ namespace MCTextViewer
                             linecnt = 0;
                         }
                         
-                        bw.ReportProgress(((i + 1) * 100) / lines.Length);
+                        bw1.ReportProgress(((i + 1) * 100) / lines.Length);
                     }
                     pages.Add(tmppage);
                 }
@@ -178,12 +186,12 @@ namespace MCTextViewer
                 {   //처음 읽었을때
                     fontsizechanging = true;
 
-                    changeLineforFont(bw);
-                    fontsizechanging = false;
+                    changeLineforFont(bw1);
+                    
                 }
                 
             };
-            bw.RunWorkerCompleted += (s, a) =>
+            bw1.RunWorkerCompleted += (s, a) =>
             {
                 
                 
@@ -216,22 +224,20 @@ namespace MCTextViewer
                     readText();
                 }
 
-
-                
-
             };
             //textLoadingbar.IsIndeterminate = true;
             textLoadingPanel.Visibility = Visibility.Visible;
 
-            bw.ProgressChanged += new ProgressChangedEventHandler(bw_ProgressChanged);
-            bw.RunWorkerAsync();
+            bw1.ProgressChanged += new ProgressChangedEventHandler(bw_ProgressChanged);
+            bw1.RunWorkerAsync();
             IsolatedStorageSettings.ApplicationSettings[this.fileName + "textfontsize"] = (int)textviewblock.FontSize;
         }
 
         void bw_ProgressChanged(object sender, ProgressChangedEventArgs e)
         {
             //string loadingmsg = "Loading..";
-            if (fontsizechanging)
+            
+            if (fontsizechanging && !App._filesaving)
             {
                 textLoadingMessage.Text = "Font size change.." + e.ProgressPercentage.ToString() + "%";
             }
@@ -456,14 +462,18 @@ namespace MCTextViewer
         public void resavefile()
         {
             textloading = true;
-            var bw = new BackgroundWorker();
-            bw.WorkerReportsProgress = true;
+            App._filesaving = true;
+            //var bw = new BackgroundWorker();
+            bw2.WorkerReportsProgress = true;
+            bw2.WorkerSupportsCancellation = true;
             textLoadingMessage.Text = "File saving..";
             textLoadingbar.IsIndeterminate = false;
             textLoadingbar.Value = 0;
             textLoadingbar.Maximum = 100;
-
-            bw.DoWork += (s, a) =>
+            
+            try { bw2.CancelAsync(); }
+            catch (Exception) { }
+            bw2.DoWork += (s, a) =>
             {
                 IsolatedStorageFile file;
                 file = IsolatedStorageFile.GetUserStoreForApplication();
@@ -473,22 +483,28 @@ namespace MCTextViewer
                 {
                     file.CreateDirectory("DownloadFiles\\ResavedFiles");
                 }
-
-                StreamWriter sw = new StreamWriter(new IsolatedStorageFileStream("DownloadFiles\\ResavedFiles\\" + this.fileName + "_resave", FileMode.Create, file));
-                String totalString = "";
-
-                for (int i = 0; i < pages.Count; i++)
+                try
                 {
-                    totalString += pages[i].ToString();
-                    
-                    bw.ReportProgress(((i + 1) * 100) / pages.Count);
-                }
+                    StreamWriter sw = new StreamWriter(new IsolatedStorageFileStream("DownloadFiles\\ResavedFiles\\" + this.fileName + "_resave", FileMode.Create, file));
 
-                sw.Write(totalString);
-                sw.Close();
+                    String totalString = "";
+                    for (int i = 0; i < pages.Count; i++)
+                    {
+                        totalString += pages[i].ToString();
+                    
+                        bw2.ReportProgress(((i + 1) * 100) / pages.Count);
+                    }
+
+                    sw.Write(totalString);
+                    sw.Close();
+                
+                }
+                catch (Exception)
+                {
+                }
             };
 
-            bw.RunWorkerCompleted += (s, a) =>
+            bw2.RunWorkerCompleted += (s, a) =>
             {
                 
                 //MessageBox.Show("Resave completed");
@@ -497,12 +513,14 @@ namespace MCTextViewer
                 textviewblock.Visibility = Visibility.Visible;
                 stackPanel1.Visibility = Visibility.Visible;
                 textloading = false;
+                fontsizechanging = false;
+                App._filesaving = false;
                 readText();
             };
 
             textviewblock.Visibility = Visibility.Collapsed;
-            bw.ProgressChanged += new ProgressChangedEventHandler(bw_ProgressChanged);
-            bw.RunWorkerAsync();
+            bw2.ProgressChanged += new ProgressChangedEventHandler(bw_ProgressChanged);
+            bw2.RunWorkerAsync();
             
         }
 
@@ -837,10 +855,17 @@ namespace MCTextViewer
                 //MessageBox.Show("!");
                 IsolatedStorageSettings.ApplicationSettings["LAST_VIEW_TEXT"] = this.fileName;
                 IsolatedStorageSettings.ApplicationSettings[this.fileName + "readcount"] = 0;
+
+                try { bw1.CancelAsync(); }
+                catch (Exception) { }
+                try { bw2.CancelAsync(); }
+                catch (Exception) { }
+               
             }
 
+
+            App._selectedtextfile = "";
             
-           
             Touch.FrameReported -= new TouchFrameEventHandler(Touch_FrameReported);
             isnewpage = false;
         }
@@ -855,6 +880,14 @@ namespace MCTextViewer
         private void btnclosetext_Click(object sender, RoutedEventArgs e)
         {
             NavigationService.GoBack();
+        }
+
+        private void PhoneApplicationPage_BackKeyPress(object sender, CancelEventArgs e)
+        {
+            try { bw1.CancelAsync(); }
+            catch (Exception) { }
+            try { bw2.CancelAsync(); }
+            catch (Exception) { }
         }
 
 

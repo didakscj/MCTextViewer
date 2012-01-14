@@ -14,6 +14,7 @@ using Microsoft.Phone.Controls;
 using Microsoft.Phone.Shell;
 using DropNet;
 using DropNet.Models;
+using System.IO.IsolatedStorage;
 
 
 namespace MCTextViewer
@@ -22,7 +23,8 @@ namespace MCTextViewer
     {
         private static MainViewModel viewModel = null;
         public static DropNetClient _client { get; set; }
-
+        public static String _selectedtextfile = "";
+        public static bool _filesaving = false;
         /// <summary>
         /// 바인딩할 뷰에서 사용되는 정적 ViewModel입니다.
         /// </summary>
@@ -104,6 +106,10 @@ namespace MCTextViewer
         private void Application_Deactivated(object sender, DeactivatedEventArgs e)
         {
             // 여기서 필수 응용 프로그램 상태가 유지되는지 확인합니다.
+            if (App._filesaving)
+            {
+                IsolatedStorageSettings.ApplicationSettings[App._selectedtextfile + "readcount"] = 0;
+            }
         }
 
         // 응용 프로그램이 닫힐 때(예: 사용자가 [뒤로]를 누르는 경우) 실행할 코드입니다.

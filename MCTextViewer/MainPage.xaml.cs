@@ -29,7 +29,7 @@ namespace MCTextViewer
     public partial class MainPage : PhoneApplicationPage
     {
         bool dpfile = false;
-
+        
         /**
          *  라이브러리 항목 리스트
          */
@@ -187,6 +187,11 @@ namespace MCTextViewer
             if (dirs.Length != 0)
             {
                 string[] filenames = file.GetFileNames("DownloadFiles\\*");
+                if (filenames.Length == 0)
+                {
+                    _textlists.Add(new LibraryDataList("No Text File", "you can download file from Dropbox", ""));
+                    ApplicationBar.IsVisible = false;
+                }
                 foreach (string s in filenames)
                 {
                     DateTimeOffset accessdate =  file.GetLastAccessTime("DownloadFiles\\" + s);
@@ -214,6 +219,7 @@ namespace MCTextViewer
             else
             {
                 //_textlists.Add(new LibraryDataList("No Text File")); 
+                _textlists.Add(new LibraryDataList("No Text File", "you can download file from Dropbox",""));
             }
         }
 
@@ -262,11 +268,13 @@ namespace MCTextViewer
 
         private void lb_library_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
-            //LibraryDataList libSelectedItem = (LibraryDataList)lb_library.SelectedItem;
-            //int libSelectedItemIndex = lb_library.SelectedIndex;
+            LibraryDataList libSelectedItem = (LibraryDataList)lb_library.SelectedItem;
+            int libSelectedItemIndex = lb_library.SelectedIndex;
 
-            ApplicationBar.Mode = ApplicationBarMode.Default;
-
+            if (libSelectedItem != null && (libSelectedItem.Name != "No Text File" && libSelectedItem.ImagePath != ""))
+            {
+                ApplicationBar.Mode = ApplicationBarMode.Default;
+            }
         }
 
         /// <summary>
@@ -493,11 +501,11 @@ namespace MCTextViewer
                         }
                         else
                         {
-                            //string Pattern = @"\.pdf";
-                            // if (System.Text.RegularExpressions.Regex.IsMatch(c.Name, Pattern))
-                            // {
-                            _dropboxdatalist.Add(new DropBoxDataList(c.Name, c.Path, c.Is_Dir));
-                            // }
+                            string Pattern = @"\.(TXT|txt|Txt|TXt|tXT|txT)";
+                            if (System.Text.RegularExpressions.Regex.IsMatch(c.Name, Pattern))
+                            {
+                                _dropboxdatalist.Add(new DropBoxDataList(c.Name, c.Path, c.Is_Dir));
+                            }
                         }
                     }
                     dropboxLoadingBar.IsIndeterminate = false;
