@@ -8,6 +8,7 @@ using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Input;
 using Microsoft.Phone.Controls;
+using System.Windows.Media;
 
 namespace MCTextViewer
 {
@@ -46,6 +47,7 @@ namespace MCTextViewer
             textLoadingbar.IsIndeterminate = true;
             isnewpage = true;
             Touch.FrameReported += new TouchFrameEventHandler(Touch_FrameReported);
+
             
         }
 
@@ -212,6 +214,7 @@ namespace MCTextViewer
                 if (readcount == 0 || FONTSIZECHANGED)
                 {
                     // Thread savenewfile = new Thread(resavefile);
+                    ContentPanel.Background = BrushFromColorName("Black");
                     resavefile();
                     
                 }
@@ -273,7 +276,7 @@ namespace MCTextViewer
                     {
 
                         templine = totalString.Substring(stringIndex, charcnt);
-                        int jj = 0;
+                        
                     }
                     catch (ArgumentOutOfRangeException)
                     {
@@ -716,6 +719,9 @@ namespace MCTextViewer
                 textindex = (int)IsolatedStorageSettings.ApplicationSettings[this.fileName];
                 textfontsize = (int)IsolatedStorageSettings.ApplicationSettings[this.fileName + "textfontsize"];
                 
+                    
+                
+
             }
             catch (Exception)
             {
@@ -726,6 +732,14 @@ namespace MCTextViewer
 
         private void readText()
         {
+            try
+            {
+                ContentPanel.Background = BrushFromColorName(IsolatedStorageSettings.ApplicationSettings["Appsetting_backgroundcolor"].ToString());
+                textviewblock.Foreground = BrushFromColorName(IsolatedStorageSettings.ApplicationSettings["Appsetting_fontcolor"].ToString());
+            }
+            catch (Exception)
+            {
+            }
             if (pages.Count > textindex && textindex >= 0)
             {
                 textviewblock.Text = pages[textindex].ToString();
@@ -788,17 +802,17 @@ namespace MCTextViewer
             }
         }
 
-        private void textviewblock_Tap(object sender, GestureEventArgs e)
+        private void textviewblock_Tap(object sender, System.Windows.Input.GestureEventArgs e)
         {
            
         }
 
-        private void ContentPanel_Tap(object sender, GestureEventArgs e)
+        private void ContentPanel_Tap(object sender, System.Windows.Input.GestureEventArgs e)
         {
            
         }
 
-        private void LayoutRoot_Tap(object sender, GestureEventArgs e)
+        private void LayoutRoot_Tap(object sender, System.Windows.Input.GestureEventArgs e)
         {
             //로딩중이면 무시
             if (textloading) return;
@@ -890,7 +904,14 @@ namespace MCTextViewer
             catch (Exception) { }
         }
 
+        public SolidColorBrush BrushFromColorName(string colorName)
+        {
+            string s;
+            s = "<SolidColorBrush xmlns='http://schemas.microsoft.com/winfx/2006/xaml/presentation'";
+            s += " Color='" + colorName + "'/>";
 
+            return System.Windows.Markup.XamlReader.Load(s) as SolidColorBrush;
+        } 
        
 
  

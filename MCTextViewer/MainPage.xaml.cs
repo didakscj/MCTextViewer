@@ -29,7 +29,33 @@ namespace MCTextViewer
     public partial class MainPage : PhoneApplicationPage
     {
         bool dpfile = false;
-        
+
+        /**
+         *  폰트 컬러 항목 리스트
+         */
+        private ObservableCollection<FontColorList> _fontcolor = new ObservableCollection<FontColorList>();
+        public ObservableCollection<FontColorList> Fontcolorlists
+        {
+            get { return _fontcolor; }
+            set
+            {
+                _fontcolor = value;
+            }
+        }
+
+        /**
+        *  폰트 컬러 항목 리스트
+        */
+        private ObservableCollection<BackgroundColorList> _backgroundcolor = new ObservableCollection<BackgroundColorList>();
+        public ObservableCollection<BackgroundColorList> Backgroundcolorlists
+        {
+            get { return _backgroundcolor; }
+            set
+            {
+                _backgroundcolor = value;
+            }
+        }
+
         /**
          *  라이브러리 항목 리스트
          */
@@ -110,6 +136,57 @@ namespace MCTextViewer
             // ListBox 컨트롤의 데이터 컨텍스트를 샘플 데이터로 설정합니다.
             //DataContext = App.ViewModel;
             //this.Loaded += new RoutedEventHandler(MainPage_Loaded);
+            string backgroundcolor = IsolatedStorageSettings.ApplicationSettings["Appsetting_backgroundcolor"].ToString();
+            string fontcolor = IsolatedStorageSettings.ApplicationSettings["Appsetting_fontcolor"].ToString();
+
+            setColorSetting(backgroundcolor, fontcolor);
+           
+
+            
+        }
+
+        private void setColorSetting(string backgroundcolor, string fontcolor)
+        {
+            lp_fontcolor.ItemsSource = Fontcolorlists;
+            _fontcolor.Add(new FontColorList("Black"));
+            _fontcolor.Add(new FontColorList("White"));
+            _fontcolor.Add(new FontColorList("Magenta"));
+            _fontcolor.Add(new FontColorList("Teal"));
+            _fontcolor.Add(new FontColorList("Orange"));
+
+            lp_backgroundcolor.ItemsSource = Backgroundcolorlists;
+            _backgroundcolor.Add(new BackgroundColorList("White"));
+            _backgroundcolor.Add(new BackgroundColorList("Black"));
+            _backgroundcolor.Add(new BackgroundColorList("Magenta"));
+            _backgroundcolor.Add(new BackgroundColorList("Teal"));
+            _backgroundcolor.Add(new BackgroundColorList("Orange"));
+
+            try
+            {
+                
+                //lb_dropboxdata.SelectedIndex = -1;
+                for (int i = 0; i < _fontcolor.Count; i++)
+                {
+                    FontColorList fcl = (FontColorList)lp_fontcolor.Items[i];
+                    if (fcl.Color == fontcolor)
+                    {
+                        lp_fontcolor.SelectedIndex = i;
+                        break;
+                    }
+                }
+                for (int j = 0; j<_backgroundcolor.Count; j++)
+                {
+                    BackgroundColorList bcl = (BackgroundColorList)lp_backgroundcolor.Items[j];
+                    if (bcl.Color == backgroundcolor)
+                    {
+                        lp_backgroundcolor.SelectedIndex = j;
+                        break;
+                    }
+                }
+            }
+            catch (Exception)
+            {
+            }
         }
 
         private void InitTextFileDownloadTab()
@@ -153,26 +230,6 @@ namespace MCTextViewer
         //        App.ViewModel.LoadData();
         //    }
         //}
-        /**
-         *  어플 셋팅 읽기 
-         */
-        public void ReadSettings()
-        {
-            
-            try
-            {
-               
-                setting_fontsize_slider.Value = (int)IsolatedStorageSettings.ApplicationSettings["Appsetting_fontsize"];
-                setting_fontsize_num.Text = setting_fontsize_slider.Value.ToString();
-            }
-            catch (KeyNotFoundException)
-            {
-                //없으면 말고
-                setting_fontsize_slider.Value = 20;
-                setting_fontsize_num.Text = setting_fontsize_slider.Value.ToString();
-            }
-        }
-
 
         /**
          *  격리 저장장소의 파일 리스트 읽기 
@@ -258,9 +315,9 @@ namespace MCTextViewer
                     break;
                 case "panoItemSettings":
                     ApplicationBar.IsVisible = false;
-                    ReadSettings();
                     break;
             }
+            
         }
 
         #endregion Private Instance Method
@@ -817,12 +874,13 @@ namespace MCTextViewer
             });
         }
 
-        private void setting_fontsize_slider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+
+        private void NumbersDataSource_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
+            NumbersDataSource fontsize = (NumbersDataSource) sender;
             try
             {
-                int val = (int)setting_fontsize_slider.Value;
-                setting_fontsize_num.Text = val.ToString();
+                int val = (int)fontsize.SelectedItem;
                 IsolatedStorageSettings.ApplicationSettings["Appsetting_fontsize"] = val;
 
             }
@@ -831,6 +889,35 @@ namespace MCTextViewer
                 //예외는 무시
             }
         }
+
+        private void lp_backgroundcolor_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            try
+            {
+                BackgroundColorList val = (BackgroundColorList)lp_backgroundcolor.SelectedItem;
+                IsolatedStorageSettings.ApplicationSettings["Appsetting_backgroundcolor"] = val.Color;
+            }
+            catch (Exception)
+            {
+                //예외는 무시
+            }
+        }
+
+        private void lp_fontcolor_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            try
+            {
+                FontColorList val = (FontColorList)lp_fontcolor.SelectedItem;
+                IsolatedStorageSettings.ApplicationSettings["Appsetting_fontcolor"] = val.Color;
+            }
+            catch (Exception)
+            {
+                //예외는 무시
+            }
+
+        }
+
+      
         
     }
 }

@@ -5,6 +5,8 @@
     xmlns:phone="clr-namespace:Microsoft.Phone.Controls;assembly=Microsoft.Phone"
     xmlns:shell="clr-namespace:Microsoft.Phone.Shell;assembly=Microsoft.Phone"
     xmlns:controls="clr-namespace:Microsoft.Phone.Controls;assembly=Microsoft.Phone.Controls"
+    xmlns:toolkit="clr-namespace:Microsoft.Phone.Controls.Primitives;assembly=Microsoft.Phone.Controls.Toolkit" 
+    xmlns:local="clr-namespace:MCTextViewer.ViewModels"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
     xmlns:helpers="clr-namespace:MCTextViewer.Helpers"
@@ -15,7 +17,7 @@
     FontSize="{StaticResource PhoneFontSizeNormal}"
     Foreground="{StaticResource PhoneForegroundBrush}"
     SupportedOrientations="Portrait"  Orientation="Portrait"
-    shell:SystemTray.IsVisible="False">
+    shell:SystemTray.IsVisible="False" xmlns:toolkit1="clr-namespace:Microsoft.Phone.Controls;assembly=Microsoft.Phone.Controls.Toolkit">
 
     <phone:PhoneApplicationPage.Resources>
         <Storyboard x:Name="openani" AutoReverse="False">
@@ -65,6 +67,19 @@
             </StackPanel>
         </DataTemplate>
 
+        <DataTemplate x:Key="FontColorDataTemplate">
+            <StackPanel Margin="0,0,0,0" Orientation="Horizontal">
+                <Ellipse Fill="{Binding Color}" Height="20" Stroke="Black" Width="20"/>
+                <TextBlock TextWrapping="Wrap" Text="{Binding Color}" FontSize="{StaticResource PhoneFontSizeNormal}" Margin="12,0,0,0" Foreground="Black" TextAlignment="Center" />
+            </StackPanel>
+         </DataTemplate>
+        <DataTemplate x:Key="BackgroundColorDataTemplate">
+            <StackPanel Margin="0,0,0,0" Orientation="Horizontal">
+                <Rectangle Fill="{Binding Color}" Height="20" Stroke="Black" Width="315"/>
+            </StackPanel>
+        </DataTemplate>
+
+
         <!-- Panorama Items Header -->
         <DataTemplate x:Key="DropBoxItemHeader">
             <Grid>
@@ -76,7 +91,7 @@
     </phone:PhoneApplicationPage.Resources>
     
     <!--LayoutRoot는 모든 페이지 내용이 배치되는 루트 표입니다.-->
-    <Grid x:Name="LayoutRoot" Background="Transparent">
+    <Grid x:Name="LayoutRoot" Background="#2AFFFFFF">
  
         <!--Panorama 컨트롤-->
         <controls:Panorama Name="panoramaMain" Title="MCText Viewer" SelectionChanged="Panorama_SelectionChanged">
@@ -114,10 +129,24 @@
             <controls:PanoramaItem Header="Settings" 
                                    HeaderTemplate="{StaticResource DropBoxItemHeader}"
                                    Tag="panoItemSettings">
-                <Grid Background="#16FFFFFF" Margin="0,0,0,65">
-                    <Slider Height="92" HorizontalAlignment="Center" Margin="148,48,15,306" Name="setting_fontsize_slider" VerticalAlignment="Center" Width="257" SmallChange="1" Minimum="15" Maximum="30" ValueChanged="setting_fontsize_slider_ValueChanged" />
-                    <TextBlock Height="30" HorizontalAlignment="Left" Margin="32,65,0,0" Name="setting_fontsize_name" Text="FontSize" VerticalAlignment="Top" Width="79" />
-                    <TextBlock Height="31" HorizontalAlignment="Left" Margin="101,65,0,0" Name="setting_fontsize_num" Text="0" VerticalAlignment="Top" Width="68" TextAlignment="Center" />
+                <Grid Background="Transparent" Margin="0,0,0,65">
+                    <Grid.Resources>
+                        <DataTemplate x:Key="NumberTemplate">
+                            <Grid>
+                                <TextBlock Text="{Binding}" FontSize="30" FontFamily="{StaticResource PhoneFontFamilySemiBold}" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                            </Grid>
+                        </DataTemplate>
+                    </Grid.Resources>
+                    <toolkit:LoopingSelector Margin="293,-70,57,246" Width="70" ItemSize="70,70" ItemTemplate="{StaticResource NumberTemplate}" Name="aa" Height="270">
+                        <toolkit:LoopingSelector.DataSource>
+                            <local:NumbersDataSource Minimum="15" Maximum="30" SelectionChanged="NumbersDataSource_SelectionChanged" x:Name="fontsizesetting" />
+                        </toolkit:LoopingSelector.DataSource>
+                    </toolkit:LoopingSelector>
+                    <TextBlock Height="68" HorizontalAlignment="Left" Margin="28,30,0,0" Name="textBlock1" Text="Font Size" VerticalAlignment="Top" Width="206" FontSize="40" />
+                    <TextBlock FontSize="40" Height="68" HorizontalAlignment="Left" Margin="28,120,0,0" Name="textBlock2" Text="Font Color" VerticalAlignment="Top" Width="206" />
+                    <TextBlock FontSize="40" Height="68" HorizontalAlignment="Left" Margin="28,182,0,0" Name="textBlock3" Text="BackGround Color" VerticalAlignment="Top" Width="334" />
+                    <toolkit1:ListPicker Background="Transparent" BorderBrush="Transparent" Foreground="White" Height="283" HorizontalAlignment="Center" HorizontalContentAlignment="Center" ItemTemplate="{StaticResource BackgroundColorDataTemplate}" Margin="30,228,50,-65" Name="lp_backgroundcolor" VerticalAlignment="Center" Width="340" SelectionChanged="lp_backgroundcolor_SelectionChanged" />
+                    <toolkit1:ListPicker Height="371" HorizontalAlignment="Center" Margin="230,116,54,-41" Name="lp_fontcolor" ItemTemplate="{StaticResource FontColorDataTemplate}" VerticalAlignment="Center" Width="136" Background="#44FFFFFF" BorderBrush="#44FFFFFF" Foreground="White" HorizontalContentAlignment="Center" SelectionChanged="lp_fontcolor_SelectionChanged" />
                 </Grid>
             </controls:PanoramaItem>
         </controls:Panorama>

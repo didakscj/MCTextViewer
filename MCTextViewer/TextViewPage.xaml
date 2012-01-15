@@ -33,7 +33,7 @@
        
 
         <!--ContentPanel - 여기에 추가 내용을 배치합니다.-->
-        <Grid x:Name="ContentPanel" Grid.Row="1" Margin="12,0,0,0" Tap="ContentPanel_Tap">
+        <Grid x:Name="ContentPanel" Grid.Row="1" Margin="12,0,0,0" Tap="ContentPanel_Tap" Background="Black">
                 <TextBlock TextWrapping="NoWrap" FontSize="20" ManipulationDelta="TextBlock_ManipulationDelta" x:Name="textviewblock" TextTrimming="None" VerticalAlignment="Top" ManipulationCompleted="textviewblock_ManipulationCompleted" Tap="textviewblock_Tap" Text=""/>
                 <StackPanel HorizontalAlignment="Left" Margin="0,0,0,0" x:Name="stackPanel1" VerticalAlignment="Top" Visibility="Visible" FlowDirection="RightToLeft">
                     <StackPanel.Projection>
