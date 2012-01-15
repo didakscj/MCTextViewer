@@ -137,16 +137,29 @@
                             </Grid>
                         </DataTemplate>
                     </Grid.Resources>
-                    <toolkit:LoopingSelector Margin="293,-70,57,246" Width="70" ItemSize="70,70" ItemTemplate="{StaticResource NumberTemplate}" Name="aa" Height="270">
+                    <toolkit:LoopingSelector Margin="293,-20,57,308" Width="70" ItemSize="70,70" ItemTemplate="{StaticResource NumberTemplate}" Name="aa" Height="158">
                         <toolkit:LoopingSelector.DataSource>
                             <local:NumbersDataSource Minimum="15" Maximum="30" SelectionChanged="NumbersDataSource_SelectionChanged" x:Name="fontsizesetting" />
                         </toolkit:LoopingSelector.DataSource>
                     </toolkit:LoopingSelector>
                     <TextBlock Height="68" HorizontalAlignment="Left" Margin="28,30,0,0" Name="textBlock1" Text="Font Size" VerticalAlignment="Top" Width="206" FontSize="40" />
-                    <TextBlock FontSize="40" Height="68" HorizontalAlignment="Left" Margin="28,120,0,0" Name="textBlock2" Text="Font Color" VerticalAlignment="Top" Width="206" />
-                    <TextBlock FontSize="40" Height="68" HorizontalAlignment="Left" Margin="28,182,0,0" Name="textBlock3" Text="BackGround Color" VerticalAlignment="Top" Width="334" />
-                    <toolkit1:ListPicker Background="Transparent" BorderBrush="Transparent" Foreground="White" Height="283" HorizontalAlignment="Center" HorizontalContentAlignment="Center" ItemTemplate="{StaticResource BackgroundColorDataTemplate}" Margin="30,228,50,-65" Name="lp_backgroundcolor" VerticalAlignment="Center" Width="340" SelectionChanged="lp_backgroundcolor_SelectionChanged" />
-                    <toolkit1:ListPicker Height="371" HorizontalAlignment="Center" Margin="230,116,54,-41" Name="lp_fontcolor" ItemTemplate="{StaticResource FontColorDataTemplate}" VerticalAlignment="Center" Width="136" Background="#44FFFFFF" BorderBrush="#44FFFFFF" Foreground="White" HorizontalContentAlignment="Center" SelectionChanged="lp_fontcolor_SelectionChanged" />
+                    <TextBlock FontSize="40" Height="68" HorizontalAlignment="Left" Margin="28,138,0,0" Name="textBlock2" Text="Font Color" VerticalAlignment="Top" Width="206" />
+                    <TextBlock FontSize="40" Height="68" HorizontalAlignment="Left" Margin="28,218,0,0" Name="textBlock3" Text="BackGround Color" VerticalAlignment="Top" Width="334" />
+                    <toolkit1:ListPicker Background="Transparent" BorderBrush="Transparent" Foreground="White" Height="231" HorizontalAlignment="Center" HorizontalContentAlignment="Center" ItemTemplate="{StaticResource BackgroundColorDataTemplate}" Margin="30,0,50,-65" Name="lp_backgroundcolor" VerticalAlignment="Bottom" Width="340" SelectionChanged="lp_backgroundcolor_SelectionChanged" />
+                    <toolkit1:ListPicker Height="371" HorizontalAlignment="Center" Margin="230,138,54,-63" Name="lp_fontcolor" ItemTemplate="{StaticResource FontColorDataTemplate}" VerticalAlignment="Center" Width="136" Background="#44FFFFFF" BorderBrush="#44FFFFFF" Foreground="White" HorizontalContentAlignment="Center" SelectionChanged="lp_fontcolor_SelectionChanged" />
+                </Grid>
+            </controls:PanoramaItem>
+
+            <!--Panorama 항목 4-->
+            <controls:PanoramaItem Header="About" 
+                                   HeaderTemplate="{StaticResource DropBoxItemHeader}"
+                                   Tag="panoItemAbout">
+                <!--텍스트 줄 바꿈이 있는 이중선 목록-->
+                <Grid Height="437" HorizontalAlignment="Left" Margin="0,0,0,0" Name="grid1" VerticalAlignment="Top" Width="420">
+                    <TextBlock Height="50" HorizontalAlignment="Left" Margin="11,80,0,0" Name="textBlock4" Text="Version" VerticalAlignment="Top" Width="130" FontSize="36" />
+                    <TextBlock FontSize="24" Height="50" HorizontalAlignment="Left" Margin="37,127,0,0" Name="textBlock5" Text="1.0" VerticalAlignment="Top" Width="117" Foreground="{StaticResource PhoneAccentBrush}" FontFamily="Tahoma"></TextBlock>
+                    <TextBlock FontSize="36" Height="50" HorizontalAlignment="Left" Margin="13,180,0,0" Name="textBlock6" Text="Contact us" VerticalAlignment="Top" Width="175" />
+                    <TextBlock FontFamily="Tahoma" FontSize="24" Foreground="{StaticResource PhoneAccentBrush}" Height="50" HorizontalAlignment="Left" Margin="39,227,0,0" Name="textBlock7" Text="didakscj@gmail.com" VerticalAlignment="Top" Width="221" />
                 </Grid>
             </controls:PanoramaItem>
         </controls:Panorama>

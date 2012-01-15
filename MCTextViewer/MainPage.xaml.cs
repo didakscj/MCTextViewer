@@ -22,6 +22,8 @@ using Microsoft.Phone.Shell;
 using System.Windows.Resources;
 using System.Text.RegularExpressions;
 using System.Threading;
+using Microsoft.Phone.Tasks;
+using Microsoft.Phone.Marketplace;
 
 namespace MCTextViewer
 {
@@ -29,7 +31,7 @@ namespace MCTextViewer
     public partial class MainPage : PhoneApplicationPage
     {
         bool dpfile = false;
-
+        public LicenseInformation licenseInfo;
         /**
          *  폰트 컬러 항목 리스트
          */
@@ -112,7 +114,7 @@ namespace MCTextViewer
         public MainPage()
         {
             InitializeComponent();
-            
+            licenseInfo = new LicenseInformation();
             
             ApplicationBar = new ApplicationBar();
             ApplicationBar.Mode = ApplicationBarMode.Minimized;
@@ -136,13 +138,40 @@ namespace MCTextViewer
             // ListBox 컨트롤의 데이터 컨텍스트를 샘플 데이터로 설정합니다.
             //DataContext = App.ViewModel;
             //this.Loaded += new RoutedEventHandler(MainPage_Loaded);
-            string backgroundcolor = IsolatedStorageSettings.ApplicationSettings["Appsetting_backgroundcolor"].ToString();
-            string fontcolor = IsolatedStorageSettings.ApplicationSettings["Appsetting_fontcolor"].ToString();
-
+            string backgroundcolor="";
+            string fontcolor = "";
+            try
+            {
+                 backgroundcolor = IsolatedStorageSettings.ApplicationSettings["Appsetting_backgroundcolor"].ToString();
+                 fontcolor = IsolatedStorageSettings.ApplicationSettings["Appsetting_fontcolor"].ToString();
+            }
+            catch
+            {
+                 backgroundcolor = "White";
+                 fontcolor = "Black"; 
+            }
             setColorSetting(backgroundcolor, fontcolor);
-           
+        }
 
-            
+        private bool CheckIsTrial()
+        {
+#if DEBUG
+            MessageBoxResult result = MessageBox.Show("OK는 정식판", "Cancel은 평가판", MessageBoxButton.OKCancel);
+
+            if (result == MessageBoxResult.OK)
+            {
+                return false;
+            }
+            else
+            {
+                return true;
+            }
+#else
+
+            //RELEASE모드
+            return licenseInfo.IsTrial();
+#endif
+
         }
 
         private void setColorSetting(string backgroundcolor, string fontcolor)
@@ -314,6 +343,7 @@ namespace MCTextViewer
 
                     break;
                 case "panoItemSettings":
+                case "panoItemAbout":
                     ApplicationBar.IsVisible = false;
                     break;
             }
@@ -601,12 +631,23 @@ namespace MCTextViewer
 
         private void SelectedFileDownload(DropBoxDataList selectedBoxItem)
         {
+            
+
             DropBoxFileDownload dropdownload = new DropBoxFileDownload();
 
             String requesturl = dropdownload.getfiledownloadrequest(selectedBoxItem.Path, "meqy9y4nicqmr3k",
                                         "8g6858obthlzghw", DropboxUserToken, DropboxScretToken);
 
-            
+
+            if (_textlists.Count + _downlists.Count >= 2)
+            {
+                if (CheckIsTrial())
+                {
+                    MessageBox.Show("On trial version, you can download up to 2 files");
+                    return;
+                }
+            }
+
             //MessageBox.Show(requesturl);
             //다운로드 리스트에 추가
             if (_downlists.Count == 0)
