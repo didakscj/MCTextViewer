@@ -108,7 +108,7 @@
             </controls:PanoramaItem>
 
             <!--Panorama 항목 2-->
-            <controls:PanoramaItem Header="Text Download" 
+            <controls:PanoramaItem Header="File Download" 
                                    HeaderTemplate="{StaticResource DropBoxItemHeader}"
                                    Tag="panoItemDropBoxDownload">
                 <!--텍스트 줄 바꿈이 있는 이중선 목록-->
